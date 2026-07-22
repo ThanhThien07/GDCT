@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Ôn Thi Trắc Nghiệm GDCT K26</title>
+  
+  <!-- Google Fonts: Inter and Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* Reset & CSS variables */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    :root {
+      --bg-gradient: radial-gradient(circle at top left, #0d1224, #070913);
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --card-border: rgba(124, 58, 237, 0.15);
+      --card-border-hover: rgba(139, 92, 246, 0.4);
+      --primary: #7c3aed;
+      --primary-glow: rgba(124, 58, 237, 0.35);
+      --secondary: #ec4899;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      
+      --correct: #10b981;
+      --correct-bg: rgba(16, 185, 129, 0.15);
+      --correct-border: rgba(16, 185, 129, 0.4);
+      
+      --incorrect: #ef4444;
+      --incorrect-bg: rgba(239, 68, 68, 0.15);
+      --incorrect-border: rgba(239, 68, 68, 0.4);
+      
+      --unanswered: #4b5563;
+      --glass-filter: blur(16px);
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(10, 15, 30, 0.8);
+      backdrop-filter: var(--glass-filter);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand i {
+      font-size: 2rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 10px var(--primary-glow));
+    }
+
+    .brand h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, #a78bfa, var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Main layout container */
+    .container {
+      display: flex;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+      gap: 2rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Left pane: settings, filters and questions */
+    .left-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 1000px;
+    }
+
+    /* Right pane: sticky stats & grid navigation */
+    .right-pane {
+      width: 380px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: sticky;
+      top: 5.5rem;
+      height: calc(100vh - 7.5rem);
+    }
+
+    /* Glassmorphism panel styling */
+    .panel {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-filter);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      transition: all 0.3s ease;
+    }
+
+    .panel:hover {
+      border-color: rgba(124, 58, 237, 0.25);
+    }
+
+    /* Stats Panel */
+    .stats-header {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 0.5rem;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-val.correct { color: var(--correct); }
+    .stat-val.incorrect { color: var(--incorrect); }
+    .stat-val.progress { color: #3b82f6; }
+
+    .stat-lbl {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Progress bar */
+    .progress-bar-container {
+      background: rgba(255, 255, 255, 0.05);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+      position: relative;
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      height: 100%;
+      width: 0%;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Action Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 14px 0 var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px 0 rgba(124, 58, 237, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    /* Grid layout */
+    .grid-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 0.5rem;
+      padding-right: 0.25rem;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(124, 58, 237, 0.3);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(124, 58, 237, 0.6);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.4rem;
+    }
+
+    .grid-btn {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .grid-btn:hover {
+      border-color: var(--primary);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    .grid-btn.correct {
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
+      color: var(--correct);
+    }
+
+    .grid-btn.incorrect {
+      background: var(--incorrect-bg);
+      border-color: var(--incorrect-border);
+      color: var(--incorrect);
+    }
+
+    .grid-btn.answered {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.3);
+      color: #c084fc;
+    }
+
+    .grid-btn.active {
+      outline: 2px solid #3b82f6;
+      outline-offset: 1px;
+    }
+
+    /* Filters section */
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-main);
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    /* Search Bar */
+    .search-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-container i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary-glow);
+    }
+
+    /* Settings section */
+    .settings-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .mode-toggle {
+      flex: 1;
+      display: flex;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 0.25rem;
+      border-radius: 0.75rem;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-btn.active {
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      color: #c084fc;
+    }
+
+    /* Question Card */
+    .question-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-bottom: 10rem;
+    }
+
+    .card {
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .q-number {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #c084fc;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .q-status-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .q-status-badge.correct {
+      background: var(--correct-bg);
+      color: var(--correct);
+      border: 1px solid var(--correct-border);
+    }
+
+    .q-status-badge.incorrect {
+      background: var(--incorrect-bg);
+      color: var(--incorrect);
+      border: 1px solid var(--incorrect-border);
+    }
+
+    .q-status-badge.unanswered {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .q-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      white-space: pre-line;
+    }
+
+    /* Options */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .option {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 0.75rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .option:not(.disabled):hover {
+      background: rgba(124, 58, 237, 0.06);
+      border-color: rgba(124, 58, 237, 0.3);
+      transform: translateX(4px);
+    }
+
+    .option-letter {
+      aspect-ratio: 1;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+
+    .option:hover .option-letter {
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .option-text {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      padding-top: 0.1rem;
+    }
+
+    /* Selection states */
+    .option.selected {
+      background: rgba(124, 58, 237, 0.15);
+      border-color: var(--primary);
+    }
+
+    .option.selected .option-letter {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    /* Answer verification states (Practice Mode / Submitted) */
+    .option.correct-choice {
+      background: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+    }
+
+    .option.correct-choice .option-letter {
+      background: var(--correct) !important;
+      border-color: var(--correct) !important;
+      color: #fff !important;
+      box-shadow: 0 0 10px var(--correct);
+    }
+
+    .option.incorrect-choice {
+      background: var(--incorrect-bg) !important;
+      border-color: var(--incorrect-border) !important;
+    }
+
+    .option.incorrect-choice .option-letter {
+      background: var(--incorrect) !important;
+      border-color: var(--incorrect) !important;
+      color: #fff !important;
+      box-shadow: 0 0 10px var(--incorrect);
+    }
+
+    .option.disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    /* Floating quick stats for mobile */
+    .mobile-stats-trigger {
+      display: none;
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      z-index: 101;
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+
+    .mobile-nav-panel {
+      display: none;
+    }
+
+    /* Empty state */
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+        padding: 1rem;
+      }
+
+      .right-pane {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 200;
+        background: #090d16;
+        padding: 1.5rem;
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .right-pane.show {
+        transform: translateY(0);
+      }
+
+      .mobile-stats-trigger {
+        display: flex;
+      }
+
+      .grid-container {
+        height: auto;
+        flex: 1;
+      }
+
+      .grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
+
+      .close-panel-btn {
+        display: block !important;
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        font-size: 1.5rem;
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+    }
+
+    .close-panel-btn {
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--primary);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      color: #fff;
+      font-weight: 500;
+      z-index: 300;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-graduation-cap"></i>
+      <h1>Ôn Thi Trắc Nghiệm <span>GDCT K26</span></h1>
+    </div>
+    <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">
+      <i class="fa-solid fa-database"></i> 200 Câu Hỏi Đã Đối Chiếu Chuẩn
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- Left Pane -->
+    <div class="left-pane">
+      
+      <!-- Top Filters Panel -->
+      <div class="panel">
+        <div class="settings-row">
+          <div style="flex: 1;">
+            <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 0.25rem;">CHẾ ĐỘ HỌC</label>
+            <div class="mode-toggle">
+              <button id="mode-practice" class="mode-btn active" onclick="setMode('practice')">Luyện Tập (Hiện Đ/S ngay)</button>
+              <button id="mode-exam" class="mode-btn" onclick="setMode('exam')">Thi Thử (Nộp bài chấm điểm)</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search-input" class="search-input" placeholder="Tìm kiếm câu hỏi (nhập từ khóa hoặc số thứ tự, VD: '105' hoặc 'Mác')..." oninput="handleSearch()">
+          </div>
+
+          <div class="filters-bar">
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-right: 0.25rem;">BỘ LỌC:</span>
+            <button id="filter-all" class="filter-btn active" onclick="setFilter('all')">Tất cả (200)</button>
+            <button id="filter-done" class="filter-btn" onclick="setFilter('done')">Đã làm (<span id="count-done">0</span>)</button>
+            <button id="filter-undone" class="filter-btn" onclick="setFilter('undone')">Chưa làm (<span id="count-undone">200</span>)</button>
+            <button id="filter-correct" class="filter-btn" onclick="setFilter('correct')">Đúng (<span id="count-correct">0</span>)</button>
+            <button id="filter-incorrect" class="filter-btn" onclick="setFilter('incorrect')">Sai (<span id="count-incorrect">0</span>)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions List -->
+      <div class="question-list" id="questions-container">
+        <!-- Rendered dynamically via lazy loading -->
+      </div>
+
+    </div>
+
+    <!-- Right Pane -->
+    <div class="right-pane panel" id="right-panel">
+      <button class="close-panel-btn" onclick="toggleMobilePanel()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div>
+        <div class="stats-header">
+          <span>Tiến Độ Học Tập</span>
+          <span style="font-size: 0.85rem; font-weight: normal; color: var(--text-muted);" id="percent-label">0%</span>
+        </div>
+        
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-val progress" id="stat-done">0/200</div>
+            <div class="stat-lbl">Đã trả lời</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-score">0%</div>
+            <div class="stat-lbl">Tỷ lệ đúng</div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box" style="border-color: rgba(16, 185, 129, 0.2);">
+            <div class="stat-val correct" id="stat-correct">0</div>
+            <div class="stat-lbl">Câu đúng</div>
+          </div>
+          <div class="stat-box" style="border-color: rgba(239, 68, 68, 0.2);">
+            <div class="stat-val incorrect" id="stat-incorrect">0</div>
+            <div class="stat-lbl">Câu sai</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div style="display: flex; flex-direction: column; gap: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
+        <button id="submit-btn" class="btn btn-primary" style="display: none;" onclick="submitExam()">
+          <i class="fa-solid fa-paper-plane"></i> Nộp Bài Chấm Điểm
+        </button>
+        <button class="btn btn-secondary" onclick="shuffleAnswersAll()">
+          <i class="fa-solid fa-shuffle"></i> Tráo Lại Đáp Án
+        </button>
+        <button class="btn btn-danger" onclick="resetProgressConfirm()">
+          <i class="fa-solid fa-arrow-rotate-left"></i> Đặt Lại Tiến Độ
+        </button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+        <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; text-transform: uppercase;">
+          <i class="fa-solid fa-list-ol"></i> Bảng dò câu hỏi nhanh
+        </div>
+        <div class="grid-container">
+          <div class="grid" id="navigation-grid">
+            <!-- Grid buttons rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Mobile Floating Trigger -->
+  <div class="mobile-stats-trigger" onclick="toggleMobilePanel()">
+    <i class="fa-solid fa-chart-simple"></i>
+  </div>
+
+  <div class="toast" id="toast">Lưu tiến độ tự động thành công!</div>
+
+  <script>
+    // Embedded questions data
+    const ORIGINAL_QUESTIONS = [{"id": 1, "question": "Thế giới quan của con người là:", "options": {"A": "Quan điểm, cách nhìn về các sự vật cụ thể", "B": "Toàn bộ những quan niệm về cuộc sống của con người và loài người", "C": "Quan niệm về vị trí của con người trong thế giới vật chất", "D": "Toàn bộ những quan điểm và niềm tin định hướng hoạt động của con người trong cuộc sống"}, "answer": "D"}, {"id": 2, "question": "Hai chức năng cơ bản của chủ nghĩa Mác – Lênin là:", "options": {"A": "Chức năng thế giới quan và bản thể luận", "B": "Chức năng thế giới quan và nhận thức luận", "C": "Chức năng thế giới quan và phương pháp luận", "D": "Chức năng bản thể luận và nhận thức luận"}, "answer": "C"}, {"id": 3, "question": "Hãy chọn câu trả lời sai về chủ nghĩa Mác – Lênin:", "options": {"A": "Là học thuyết của C.Mác, Ph. Ănghen và V.I.Lênin về xây dựng chủ nghĩa cộng sản", "B": "Chủ nghĩa Mác – Lênin “là hệ thống quan điểm và học thuyết” khoa học của C.Mác, Ăngghen và sự phát triển của V.I.Lênin", "C": "Là thế giới quan, phương pháp luận phổ biến của nhận thức khoa học và thực tiễn cách mạng", "D": "Là khoa học về sự nghiệp giải phóng giai cấp vô sản, giải phóng nhân dân lao động khỏi chế độ áp bức, bóc lột và tiến tới giải phóng con người."}, "answer": "A"}, {"id": 4, "question": "Chọn đáp án đúng nhất về chủ nghĩa Mác – Lênin:", "options": {"A": "Là hệ thống quan đi ểm và học thuyết khoa học của C.Mác, Ph.Ănghen và sự phát triển của V.I.Lênin", "B": "Là sự kế thừa và phát tri ển những giá trị của lịch sử tư tưởng nhân loại, trên cơ sở thực tiễn của thời đại", "C": "Là khoa học về sự nghiệp giải phóng giai cấp vô sản, giải phóng nhân dân lao động và gi ải phóng con người; là thế giới quan và phương pháp luận phổ biến của nhân thức khoa học và thực tiễn cách mạng.", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 5, "question": "Đảng Cộng Sản Việt Nam đã khẳng định vai trò nền tảng tư tưởng của chủ nghĩa Mác – Lênin và tư tưởng Hồ Chí Minh bắt đầu từ đại hội nào?", "options": {"A": "Đại hội VI (1986)", "B": "Đại hội VII (1991)", "C": "Đại hội VIII (1996)", "D": "Đại hội IX (2001)"}, "answer": "B"}, {"id": 6, "question": "Chủ nghĩa Mác – Lênin bao gồm:", "options": {"A": "2 bộ phận", "B": "3 bộ phận", "C": "4 bộ phận", "D": "5 bộ phận"}, "answer": "B"}, {"id": 7, "question": "Bộ phận nào không thuộc chủ nghĩa Mác – Lênin:", "options": {"A": "Triết học Mác – Lênin", "B": "Kinh tế chính trị Mác – Lênin", "C": "Lịch sử Đảng Cộng sản Việt Nam", "D": "Chủ nghĩa xã hội khoa học"}, "answer": "C"}, {"id": 8, "question": "Đâu là nguồn gốc lý luận trực tiếp của chủ nghĩa Mác?", "options": {"A": "Triết học Khai sáng Pháp", "B": "Triết học cổ điển Đức", "C": "Kinh tế chính trị tư sản cổ điển Anh", "D": "Triết học Hy Lạp cổ đại"}, "answer": "B"}, {"id": 9, "question": "Mọi dạng cụ thể của vật chất đều tồn tại ở một vị trí nhất định, có một quảng tính (chiều cao, chiều rộng, chiều dài) nhất định và tồn tại trong các mối tương quan nh ất định (trước và sau, trên hay dưới, bên phải hay bên trái,…) với những dạng vật chất khác. Những hình thức tồn tại như vậy được gọi là:", "options": {"A": "Mối liên hệ", "B": "Không gian", "C": "Thời gian", "D": "Vận động"}, "answer": "B"}, {"id": 10, "question": "Mâu thuẫn chỉ được giải quyết bằng:", "options": {"A": "Sự thương lượng giữa các mặt đối lập", "B": "Sự điều hòa mâu thuẫn", "C": "Sự đấu tranh giữa các mặt đối lập", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 11, "question": "Quy luật nào của phép biện chứng duy vật vạch ra cách thức của sự vận động, phát triển?", "options": {"A": "Quy luật thống nhất và đấu tranh của các mặt đối lập", "B": "Quy luật chuyển hóa từ sự thay đổi về lượng dẫn đến sự thay đổi về chất và ngược lại", "C": "Quy luật về sự phù hợp của quan hệ sản xuất với tính chất và trình độ của lực lượng sản xuất", "D": "Quy luật phủ định của phủ định"}, "answer": "B"}, {"id": 12, "question": "Phạm trù thể hiện mối quan hệ giữa con người và tự nhiên trong quá trình sản xuất", "options": {"A": "Phương thức sản xuất", "B": "Quan hệ sản xuất", "C": "Lực lượng sản xuất", "D": "Tư liệu sản xuất"}, "answer": "C"}, {"id": 13, "question": "Phạm trù th ể hiện mối quan hệ giữa con ngư ời và con ngư ời trong quá trình sản xuất là:", "options": {"A": "Phương thức sản xuất", "B": "Quan hệ sản xuất", "C": "Lực lượng sản xuất", "D": "Tư liệu sản xuất"}, "answer": "B"}, {"id": 14, "question": "Cơ sở hạ tầng là:", "options": {"A": "Toàn bộ đất đai, máy móc, phương tiện để sản xuất", "B": "Toàn bộ những quan hệ sản xuất hợp thành một cơ cấu kinh tế của một xã hội nhất định", "C": "Toàn bộ những thành phần kinh tế của một xã hội", "D": "Là cơ cấu công – nông nghiệp của một nền kinh tế - xã hội"}, "answer": "B"}, {"id": 15, "question": "Hàng hóa là", "options": {"A": "Là sản phẩm của lao động", "B": "Thỏa mãn nhu cầu nào đó của con người", "C": "Thông qua trao đổi, mua bán", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 16, "question": "Hàng hóa có hai thuộc tính là:", "options": {"A": "Giá trị sử dụng và giá trị", "B": "Giá trí sử dụng và giá trị trao đổi", "C": "Giá trị và giá trị trao đổi", "D": "Giá trị cá biệt và giá trị xã hội"}, "answer": "A"}, {"id": 17, "question": "Giá trị sử dụng của hàng hóa là:", "options": {"A": "Công dụng của sản phẩm có thể thỏa mãn nhu cầu nào đó của con người", "B": "Tính hữu ích của vật", "C": "Thuộc tính tự nhiên của vật", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 18, "question": "Giá trị của hàng hóa được quyết định bởi:", "options": {"A": "Sự khan hiếm của hàng hóa", "B": "Lao động xã hội của người sản xuất hoàng hóa", "C": "Lao động trừu tượng của người sản xuất kết tinh trong hàng hóa", "D": "Công dụng của hàng hóa"}, "answer": "B"}, {"id": 19, "question": "Giá cả của hàng hóa là:", "options": {"A": "Sự thảo thuận giữa người mua và người bán", "B": "Sự biểu hiện bằng tiền của giá trị", "C": "Số tiền người mua phải trả cho người bán", "D": "Giá tiền đã in trên sản phẩm hoặc người bán quy định"}, "answer": "B"}, {"id": 20, "question": "Bản chất Giai cấp công nhân của Đảng Cộng sản Việt Nam được thể hiện:", "options": {"A": "Số lượng đảng viên trong Đảng", "B": "Trình độ đảng viên trong Đảng", "C": "Nền tảng lý luận, mục tiêu, đường lối, nguyên tắc tổ chức của Đảng", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 21, "question": "Toàn bộ những quan điểm, quan niệm và niềm tin định hướng hoạt động của con người trong cuộc sống gọi là ?", "options": {"A": "Quan niệm sống của con người.", "B": "Cách sống của con người.", "C": "Thế giới quan.", "D": "Lối sống của con người."}, "answer": "C"}, {"id": 22, "question": "Theo quan đi ểm của chủ nghĩa Mác - Lênin, khái ni ệm Giai cấp công nhân đư ợc hiểu:", "options": {"A": "Những người làm thuê trong các xí nghiêp công nghiêp", "B": "Sản phẩm của nền công nghiêp tự bản chủ nghĩa, đại diện cho lực lượng sản xuất hiện đại và phương thức sản xuất tiến bộ", "C": "Đại diện cho lực lượng sản xuất hiện đại và phương thức sản xuất tiến bộ", "D": "Tất cả đều đúng"}, "answer": "B"}, {"id": 23, "question": "Thời kỳ quá độ lên chủ nghĩa xã hội trên phạm vi cả nước ở Việt Nam được bắt đầu:", "options": {"A": "Tháng 2/1930", "B": "Tháng 8/1945", "C": "Tháng 5/1954", "D": "Tháng 4/1975"}, "answer": "D"}, {"id": 24, "question": "Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (Bổ sung, sửa đổi năm 2011) xác định có mấy đặc trưng cơ bản của xã hội xã hội chủ nghĩa ở Việt Nam?", "options": {"A": "5 đặc trưng", "B": "6 đặc trưng", "C": "7 đặc trưng", "D": "8 đặc trưng"}, "answer": "D"}, {"id": 25, "question": "Hãy điền vào chỗ trống để biết Văn kiện Đại hội Đảng toàn quốc lần thứ XI (2011) xác định đặc trưng đầu tiên trong mô hình ch ủ nghĩa xã hội ở nước ta: \"dân giàu, nư ớc mạnh,... công bằng, văn minh\".", "options": {"A": "Tiến bộ", "B": "Dân chủ", "C": "Bình đẳng", "D": "Phát triển"}, "answer": "B"}, {"id": 26, "question": "Vì sao quá độ lên chủ nghĩa xã hội bỏ qua chế độ tư bản chủ nghĩa ở Việt Nam là tất yếu khách quan?", "options": {"A": "Đảng Cộng sản Việt Nam đã có đường lối đúng đắn", "B": "Do sự phát triển của lực lượng sản xuất", "C": "Vì nó phù hợp với đặc điểm của đất nước và xu thế phát triển của thời đại", "D": "Vì nó đáp ứng được nguyện vọng và mong muốn của nhân dân ta"}, "answer": "C"}, {"id": 27, "question": "Giai cấp công nhân Việt Nam muốn trở thành người lãnh đạo cách mạng Việt Nam thì phải:", "options": {"A": "Phát triển về số lượng", "B": "Liên minh với giai cấp nông dân", "C": "Được vũ trang về tư tưởng, lý luận và có đội tiên phong là Đảng Cộng sản lãnh đạo", "D": "Kiên quyết chống đế quốc, phong kiến"}, "answer": "C"}, {"id": 28, "question": "Giai cấp công nhân là giai cấp triệt để cách mạng, vì:", "options": {"A": "Xóa bỏ chủ nghĩa tư bản và xây dựng chủ nghĩa xã hội", "B": "Là giai cấp không có tư liệu sản xuất", "C": "Là giai cấp cùng khổ nhất trong xã hội", "D": "Là giai cấp đại diện cho phương thức sản xuất tiến bộ nhất trong lịch sử, thực hiện xóa bỏ mọi chế độ tư hữu"}, "answer": "D"}, {"id": 29, "question": "\"Chìa khóa vàng\" để Giai cấp công nhân Việt Nam thực hiện có hiệu quả sứ mệnh lịch sử của mình ở Việt Nam trong giai đoạn hiện nay là:", "options": {"A": "Trí thức hóa Giai cấp công nhân Việt Nam", "B": "Tư bản hóa Giai cấp công nhân Việt Nam", "C": "Nâng cao đạo đức cách mạng Giai cấp công nhân Việt Nam", "D": "Sự quản lý của Nhà nước xã hội chủ nghĩa đối với Giai cấp công nhân Việt Nam"}, "answer": "A"}, {"id": 30, "question": "Theo quan điểm của chủ nghĩa Mác – Lênin, để hình thành cái mới thì sự phủ định được thực hiện ít nhất là mấy lần?", "options": {"A": "Một lần", "B": "Hai lần", "C": "Ba lần", "D": "Bốn lần"}, "answer": "B"}, {"id": 31, "question": "Chọn câu trả lời đúng nhất:", "options": {"A": "Hồ Chí Minh là anh hùng giải phóng dân tộc và là nhà văn hóa", "B": "Hồ Chí Minh là anh hùng gi ải phóng của dân tộc Việt Nam và là danh nhân văn hóa ki ệt xuất của thế giới", "C": "Hồ Chí Minh là anh hùng giái phóng dân tộc của Việt Nam và là một nhà văn hóa kiệt xuất", "D": "Hồ Chí Minh là nhà văn hóa kiệt xuất của thế giới"}, "answer": "B"}, {"id": 32, "question": "Khái niệm tư tưởng Hồ Chí Minh được Đảng ta chính thức sử dụng từ:", "options": {"A": "Từ năm 1945", "B": "Từ năm 1969", "C": "Từ năm 1986", "D": "Từ năm 1991"}, "answer": "D"}, {"id": 33, "question": "Thuật ngữ \"Tư tưởng Hồ Chí Minh\" được dùng theo nghĩa:", "options": {"A": "Là tư tưởng của một cá nhân", "B": "Là tư tưởng của lãnh tụ", "C": "Là tư tưởng của một giai cấp, một dân tộc", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 34, "question": "Chọn câu trả lời đúng nhất.", "options": {"A": "Tư tưởng Hồ Chí Minh là kết quả của sự vận dụng sáng tạo chủ nghĩa Mác - Lênin vào điều kiện thực tế của nước ta", "B": "Tư tưởng Hồ Chí Minh là kết quả của sự vận dụng và phát triển sáng tạo chủ nghĩa Mác - Lênin vào điều kiện cụ thể của nước ta", "C": "Tư tưởng Hồ Chí Minh là kết quả của sự phát triển sáng tạo chủ nghĩa Mác - Lênin vào điều kiện thực tế của nước ta", "D": "Tư tưởng Hồ Chí Minh là kết quả của sự vận dụng và phát tri ển chủ nghĩa Mác - Lênin vào điều kiện cụ thể của nước ta"}, "answer": "B"}, {"id": 35, "question": "Tìm đáp án sai trong các câu sau đây: Khái ni ệm tư tưởng Hồ Chí Minh bao gồm những yếu tố nào?", "options": {"A": "Bản chất cách mạng và khoa học của tư tưởng Hồ Chí Minh", "B": "Nguồn gốc tư tưởng - lý luận của tư tưởng Hồ Chí Minh", "C": "Nội dung tư tưởng Hồ Chí Minh", "D": "Kết cấu tư tưởng Hồ Chí Minh"}, "answer": "D"}, {"id": 36, "question": "Tư tưởng Hồ Chí Minh có vị trí như thế nào trong hệ thống tư tưởng của Đảng Cộng sản Việt Nam?", "options": {"A": "Là một bộ phận trong hệ thống tư tưởng của Đảng", "B": "Là bộ phận quan trọng trong hệ thống tư tưởng của Đảng", "C": "Là bộ phận rất quan trọng trong hệ thống tư tưởng của Đảng", "D": "Là bộ phận nền tảng, kim chỉ nam cho hành động của Đảng"}, "answer": "D"}, {"id": 37, "question": "\"Đảng lấy chủ nghĩa Mác - Lênin và tư tưởng Hồ Chí Minh làm nền tảng tư tưởng và kim ch ỉ nam cho hành động\", câu nói trên đư ợc Đảng ta kh ẳng định tại Đại hội Đảng toàn quốc lần thứ mấy?", "options": {"A": "Đại hội Đảng toàn quốc lần thứ IV", "B": "Đại hội Đảng toàn quốc lần thứ V", "C": "Đại hội Đảng toàn quốc lần thứ VI", "D": "Đại hội Đảng toàn quốc lần thứ VII"}, "answer": "D"}, {"id": 38, "question": "Kiên trì con đường Hồ Chí Minh đã lựa chọn nghĩa là:", "options": {"A": "Giữ vững nền độc lập dân tộc", "B": "Thực hiện triệt để cuộc cách mạng dân tộc dân chủ nhân dân", "C": "Thực hiện mục tiêu độc lập dân tộc gắn liền với chủ nghĩa xã hội", "D": "Hội nhập với nền kinh tế thể giới"}, "answer": "C"}, {"id": 39, "question": "Lúc nhỏ Chủ tịch Hồ Chí Minh có tên là:", "options": {"A": "Nguyễn Sinh Khiêm", "B": "Nguyễn Sinh Sắc", "C": "Nguyễn Sinh Cung", "D": "Nguyễn Sinh Thành"}, "answer": "C"}, {"id": 40, "question": "Điểm nổi bật trong nhân cách Hồ Chí Minh là:", "options": {"A": "Năng lực tư duy năng động, nhạy bén, nhìn xa trông rộng", "B": "Lòng nhân ái rộng mở", "C": "Có ý chí mãnh liệt và nghị lực phi thường trong thực hiện mục đích đã chọn", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 41, "question": "Bắt đầu từ giai đoạn nào, ở Bác hình thành tư tưởng yêu nư ớc và chí hư ớng cứu nước?", "options": {"A": "Giai đoạn trước 1911", "B": "Giai đoạn từ 1911 - 1920", "C": "Giai đoạn từ 1920 - 1930", "D": "Giai đoạn từ 1930 - 1941"}, "answer": "A"}, {"id": 42, "question": "Nguyễn Ái Quốc dự đại hội Tua tán thành Quốc tế I, tham gia sáng lập Đảng Cộng sản Pháp vào:", "options": {"A": "Tháng 12 năm 1918", "B": "Tháng 12 năm 1919", "C": "Tháng 12 năm 1920", "D": "Tháng 12 năm 1923"}, "answer": "C"}, {"id": 43, "question": "Chọn phương án trả lời đúng với tư tưởng Hồ Chí Minh:", "options": {"A": "Từ năm 1890 đến năm 1911: Thời kỳ nghiên cứu, khảo sát thực tế, đến với chủ nghĩa Mác - Lênin", "B": "Từ năm 1911 - 1920: Thời kỳ hình thành tư tưởng yêu nước, chí hướng cứu nước", "C": "Từ năm 1921 - 1930: Thời kỳ hình thành cơ bản tư tưởng về con đường cách mạng Việt Nam", "D": "Từ 1931 - 1940: Thời kỳ Bác về nước và trực tiếp chỉ đạo cách mạng Việt Nam"}, "answer": "C"}, {"id": 44, "question": "Nguyễn Tất Thành ra đi tìm đường cứu nước tại bến cảng Nhà Rồng Sài Gòn vào:", "options": {"A": "5/6/1911", "B": "2/6/1911", "C": "4/6/1911", "D": "6/5/1911"}, "answer": "A"}, {"id": 45, "question": "\"Luận cương của V .I Lênin làm cho tôi rất cảm động, phần khởi, sáng tỏ, tin tưởng biết bao. Tôi vui mừng đến phát khóc lên. Ngồi một mình trong buồng mà tôi nói to lên như đang nói trước quần chúng đông đảo: hỡi đồng bào bị đọa đày đau khổ? Đây là cái cần thiết cho chúng ta, đây là con đường giải phóng của chúng ta\". Nguyễn Ái Quốc đang để cập đến:", "options": {"A": "Luận cương tháng Mười", "B": "Luận cương về Phoiơbắc", "C": "Luận cương về vấn đề dân tộc và thuộc địa", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 46, "question": "Theo Hồ Chí Minh, người cách mạng có mấy phẩm chất đạo đức cách mạng cơ bản?", "options": {"A": "Có 4 phẩm chất đạo đức cơ bản", "B": "Có 5 phẩm chất đạo đức cơ bản", "C": "Có 6 phẩm chất đạo đức cơ bản", "D": "Có 7 phẩm chất đạo đức cơ bản"}, "answer": "A"}, {"id": 47, "question": "Chọn cụm từ điền vào chỗ trống đúng với tư tưởng Hồ Chí Minh: \"Việt Nam đi lên chủ nghĩa xã hội từ một nước thuộc địa nửa phong kiến,...”:", "options": {"A": "Bỏ qua giai đoạn phát triển tư bản chủ nghĩa", "B": "Không kinh qua giai đoạn phát triển tư bản chủ nghĩa", "C": "Bỏ qua chế độ tư bản chủ nghĩa", "D": "Xuyên qua chủ nghĩa tư bản"}, "answer": "B"}, {"id": 48, "question": "Nội dung của lòng \"trung với nước, hiếu với dân\" trong tư tưởng Hồ Chí Minh là:", "options": {"A": "Suốt đời phấn đấu cho Đảng, cho cách mạng", "B": "Thương dân, tin dân, dựa vào dân", "C": "Dựa vào dân, coi dân là gốc", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 49, "question": "\"Đảng ta là một Đảng cầm quyền. Mỗi đảng viên và cán bộ phải thật sự thấm nhuần đạo đức cách mạng, thật sự cần kiệm liêm chính, chí công vô tư. Ph ải giữ gìn Đảng ta thật trong sạch, phải xứng đáng là ngư ời lãnh đạo, là ngư ời đầy tớ thật trung thành của nhân dân\". Hồ Chí Minh đã nói ở:", "options": {"A": "Trong tác phẩm \"Di chúc\"", "B": "Trong tác phẩm \"Đường kách mệnh\"", "C": "Trong tác phẩm \"Đạo đức cách mạng\"", "D": "Trong tác phẩm \"Sửa đổi lối làm việc\""}, "answer": "A"}, {"id": 50, "question": "Điền từ còn thiếu vào chỗ trống để hoàn thành câu nói của Chủ tịch Hồ Chí Minh: \"Đoàn kết là một truyền thống cực kỳ quý báu của Đảng ta, của dân ta. Các đồng chí từ trung ương đến các chi bộ cần phải giữ gìn sự ... nhất trí của Đảng như giữ gìn con ngươi của mắt mình\":", "options": {"A": "Đạo đức", "B": "Đoàn kết", "C": "Cách mạng", "D": "Thống nhất"}, "answer": "B"}, {"id": 51, "question": "Điền từ còn thiếu vào chỗ trống để hoàn thành câu nói của Chủ tịch Hồ Chí Minh: “Toàn thể dân tộc Việt Nam quyết đem… để giữ vững quyền tự do, độc lập ấy”.", "options": {"A": "Toàn bộ sức lực", "B": "Tất cả tinh thần và lực lượng", "C": "Tất cả tinh thần và lực lượng, tính mạng và của cải", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 52, "question": "\"Hỡi đồng bào bị đọa đầy đau kh ổ! Đây là cái cần thiết cho chúng ta, đây là con đường giải phóng chúng ta\". Nguyễn Ái Quốc muốn nhắc đến:", "options": {"A": "Cách mạng tháng Mười Nga", "B": "Sự ra đời của Quốc tế thứ ba", "C": "Bản sơ thảo lần thứ nhất những luận cương về vấn đề dân tộc và vấn đề thuộc địa của Lênin", "D": "Chủ nghĩa Mác"}, "answer": "C"}, {"id": 53, "question": "Mục đích của tư tưởng Hồ Chí Minh là:", "options": {"A": "Giải phóng dân tộc", "B": "Giải phóng các dân tộc thuộc địa", "C": "Giải phóng dân tộc, giải phóng giai cấp và giải phóng con người", "D": "Giải phóng giai cấp và giải phóng con người"}, "answer": "C"}, {"id": 54, "question": "\"Tất cả các dân tộc trên thế giới đều sinh ra bình đẳng, dân tộc nào cũng có quyền sống, quyền sung sướng và quyền tự do\". Câu trên Hồ Chí Minh nói ở trong:", "options": {"A": "Tác phẩm \"Tuyên ngôn độc lập\"", "B": "Tác phẩm \"Bản án chế độ thực dân Pháp\"", "C": "Tác phẩm \"Đường kách mệnh\"", "D": "Tác phẩm \"Lời kêu gọi toàn quốc kháng chiến\""}, "answer": "A"}, {"id": 55, "question": "Hồ Chí Minh là người đấu tranh đòi quyền độc lập cho:", "options": {"A": "Dân tộc Việt Nam", "B": "Các dân tộc thuộc địa phương Đông.", "C": "Dân tộc Việt Nam và tất cả các dân tộc bị áp bức trên thế giới", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 56, "question": "Chọn câu trả lời đúng nhất:", "options": {"A": "Chủ nghĩa Mác - Lênin là cơ sở thế giới quan, phương pháp luận, nguồn gốc tư tưởng, lý luận trực tiếp quyết định bản chất cách mạng, khoa học của tư tưởng Hồ Chí Minh", "B": "Chủ nghĩa Mác - Lênin là cơ sở thế giới quan, phương pháp lu ận, nguồn gốc chủ quan, quyết định bản chất cách mạng, khoa học của tư tưởng Hồ Chí Minh", "C": "Chủ nghĩa Mác - Lênin là cơ sở thế giới quan, phương pháp lu ận, trang bị cho Hồ Chí Minh phầm chất đạo đức và năng lực hoạt động thực tiễn", "D": "Chủ nghĩa Mác - Lênin là cơ sở chủ quan, nguồn gốc tư tưởng, lý luận trực tiếp quyết định bản chất cách mạng, khoa học của tư tưởng Hồ Chí Minh"}, "answer": "A"}, {"id": 57, "question": "Nhận định nào ph ản ánh giá tr ị, ýnghĩa, sức hấp dẫn và sức sống lâu bền của tư tưởng Hồ Chí Minh?", "options": {"A": "Tư tưởng Hồ Chí Minh là kết quả của sự vận dụng sáng tạo chủ nghĩa Mác - Lênin vào điều kiện cụ thể của nước ta", "B": "Tư tưởng Hồ Chí Minh là quan đi ểm toàn di ện và sâu sắc về những vấn đề cơ bản của cách mạng Việt Nam", "C": "Tư tưởng Hồ Chí Minh là sự kế thừa và phát triển các giá trị truyền thống dân tộc, tiếp thu tinh hoa văn hóa nhân loại", "D": "Tư tưởng Hồ Chí Minh là tài sản tinh thần vô cùng to lớn và quý giá của Đảng và dân tộc ta"}, "answer": "D"}, {"id": 58, "question": "Nhận định nào phản ánh nguồn gốc tư tưởng, lý luận của tư tưởng Hồ Chí Minh?", "options": {"A": "Tư tưởng Hồ Chí Minh là kết quả của sự vận dụng sáng tạo chủ nghĩa Mác - Lênin vào điều kiện cụ thể của nước ta", "B": "Tư tưởng Hồ Chí Minh là quan đi ểm toàn di ện và sâu sắc về những vấn đề cơ bản của cách mạng Việt Nam", "C": "Tư tưởng Hồ Chí Minh là sự kế thừa và phát triển các giá trị truyền thống dân tộc, tiếp thu tinh hoa văn hóa nhân loại", "D": "Tư tưởng Hồ Chí Minh là kết quả của sự vận dụng sáng tạo chủ nghĩa Mác - Lênin và phát triển giá trị truyền thống dân tộc, tinh hoa văn hóa nhân loại"}, "answer": "D"}, {"id": 59, "question": "Sinh viên cần học những gì ở đạo đức Hồ Chí Minh?", "options": {"A": "Học trung với nước, hiếu với dân; Cần, kiệm, liêm, chính", "B": "Học đức tin vào sức mạnh của nhân dân, luôn nhân ái, vị tha, khoan dung, độ lượng, nhân hậu với con người", "C": "Học tấm gương về ý chí và nghị lực tinh thần to lớn, quyết tâm vượt qua mọi thử thách, gian nguy để đạt được mục đích cuộc sống", "D": "Tất cả những phẩm chất trên"}, "answer": "D"}, {"id": 60, "question": "Theo tư tưởng Hồ Chí Minh, gốc của người cách mạng là:", "options": {"A": "Tài năng", "B": "Đạo đức", "C": "Phẩm chất", "D": "Tất cả đều đúng"}, "answer": "B"}, {"id": 61, "question": "Hội nghị hợp nhất các tổ chức cộng sản để thành lập Đảng Cộng sản Việt Nam (02/1930) diễn ra tại đâu?", "options": {"A": "Hà Nội - Việt Nam", "B": "Nghệ An - Việt Nam", "C": "Hương Cảng - Trung Quốc", "D": "Cao Bằng - Việt Nam"}, "answer": "C"}, {"id": 62, "question": "Điền từ còn thiếu vào chỗ trống: \"Đảng Cộng sản Việt Nam ra đời là sản phẩm của sự kết hợp chủ nghĩa Mác - Lênin, với phong trào công nhân và ... ở nước ta vào những năm cuối thập kỷ của thế kỷ XX\":", "options": {"A": "Chủ nghĩa yêu nước", "B": "Phong trào yêu nước", "C": "Truyền thống yêu nước", "D": "Truyền thống dân tộc"}, "answer": "B"}, {"id": 63, "question": "Dưới sự lãnh đạo của Đảng, nhân dân ta đã giành được những thắng lợi nào?", "options": {"A": "Thắng lợi của Cách mạng tháng 8 năm 1945 và vi ệc thành lập Nhà nước Việt Nam Dân ch ủ Cộng hòa", "B": "Giai đoạn 1945 - 1975: Thắng lợi của các cuộc kháng chiến oanh liệt để giải phóng dân tộc, bảo vệ Tổ quốc", "C": "Thắng lợi của sự nghiệp đổi mới và từng bước đưa đất nước quá độ lên chủ nghĩa xã hội", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 64, "question": "Vì sao sự ra đời của Đảng Cộng sản Việt Nam (1930) là bư ớc ngoặt vĩ đại của lịch sử cách mạng Việt Nam?", "options": {"A": "Kết thúc thời kỳ phát triển của khuynh hướng cách mạng dân chủ tư sản", "B": "Đưa giai cấp công nhân và nông dân lên lãnh đạo cách mạng", "C": "Chấm dứt tình trạng khủng hoảng về đường lối và giai cấp lãnh đạo", "D": "Chấm dứt tình trạng chia rẽ giữa các tổ chức chính trị ở Việt Nam"}, "answer": "C"}, {"id": 65, "question": "Khi nào phong trào công nhân Vi ệt Nam hoàn toàn tr ở thành một phong trào tự giác?", "options": {"A": "Năm 1920 (Tổ chức công hội ở Sài Gòn được thành lập)", "B": "Năm 1925 (Cuộc bãi công của công nhân Ba Son)", "C": "Năm 1930 (Thành lập Đảng Cộng sản Việt Nam)", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 66, "question": "Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung, phát triển năm 2011) do Đại hội Đảng lần thứ XI thông qua năm 2011 đã nêu năm bài học lớn của cách mạng Việt Nam. Trong đó, bài học đầu tiên là:", "options": {"A": "Nắm vững ngọn cờ độc lập dân tộc và chủ nghĩa xã hội", "B": "Sự nghiệp cách mạng là của nhân dân, do nhân dân và vì nhân dân", "C": "Chủ động và tích cực hội nhập kinh tế quốc tế", "D": "Sự lãnh đạo đúng đắn của Đảng là nhân tố hàng đầu đảm bảo thắng lợi của cách mạng Việt Nam"}, "answer": "A"}, {"id": 67, "question": "Mục tiêu \"Đưa nư ớc ta cơ bản trở thành nước công nghiệp theo hướng hiện đại\" được Đại hội Đảng lần thứ XI xác định sẽ ra sức phấn đấu thực hiện trong khoảng thời gian:", "options": {"A": "Từ nay đến năm 2015", "B": "Từ nay đến năm 2020", "C": "Từ nay đến năm 2025", "D": "Từ nay đến năm 2050"}, "answer": "B"}, {"id": 68, "question": "Tại đại hội Đảng lần thứ XI đã xác định nhiệm vụ trung tâm là:", "options": {"A": "Đổi mới hệ thống chính trị", "B": "Củng cố quốc phòng, an ninh", "C": "Phát triển kinh tế", "D": "Nâng cao dân trí, bồi dưỡng và phát huy nguồn lực to lớn của con người Việt Nam"}, "answer": "C"}, {"id": 69, "question": "Đảng lãnh đạo là nhân tố có ýnghĩa thế nào đối với thắng lợi cách mạng nước ta?", "options": {"A": "Có ýnghĩa quan trọng", "B": "Có ýnghĩa rất quan trọng", "C": "Có ýnghĩa quan trọng đặc biệt", "D": "Có ýnghĩa quyết định hàng đầu thẳng lợi của cách mạng nước ta"}, "answer": "D"}, {"id": 70, "question": "Chọn đáp án sai trong những đáp án được rút ra từ mệnh đề sau: \"Đảng ta vừa là người lãnh dạo, vừa là người đầy tớ thật trung thành của nhân dân\":", "options": {"A": "Đầy tớ là tôi tớ, tôi đòi, theo đuôi quần chúng", "B": "Là tận tâm, tận lực phụng sự quần chúng", "C": "Là việc gì có lợi cho dân thì phải hết sức làm, việc gì có hại cho dân thì phải hết sức tránh", "D": "Là khổ trước thiên hạ, vui sau thiên hạ"}, "answer": "A"}, {"id": 71, "question": "Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung, phát triển năm 2011) do đại hội Đảng lần thứ XI thông qua năm 2011 đã nêu những bài học lớn của cách mạng Việt Nam. Đó là:", "options": {"A": "Nắm vững ngọn cờ độc lập dân tộc và chủ nghĩa xã hội", "B": "Sự nghiệp cách mạng là của nhân dân, do nhân dân và vì nhân dân", "C": "Sự lãnh đạo đúng đắn của Đảng là nhân tố hàng đầu đảm bảo thắng lợi của cách mạng Việt Nam", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 72, "question": "Tổng bí thư đầu tiên của Đảng ta là:", "options": {"A": "Đồng chí Trần Phú", "B": "Đồng chí Trịnh Đình Cửu", "C": "Đồng chí Lê Hồng Phong", "D": "Đồng chí Nguyễn Văn Linh"}, "answer": "A"}, {"id": 73, "question": "Điền vào chỗ trống: \" .... là đội tiên phong của giai cấp công nhân, đồng thời là đội tiên phong của nhân dân lao động và của dân tộc Việt Nam; đại biểu trung thành lợi ích của giai cấp công nhân, nhân dân lao động và của dân tộc\":", "options": {"A": "Đảng Cộng sản Việt Nam", "B": "Quốc hội nước Cộng hòa xã hội chủ nghĩa Việt Nam", "C": "Chính phủ nước Cộng hòa xã hội chủ nghĩa Việt Nam", "D": "Tất cả đều đúng"}, "answer": "A"}, {"id": 74, "question": "Ai chủ trì hội nghị hợp nhất 3 tổ chức cộng sản của nước ta?", "options": {"A": "Đồng chí Trịnh Đình Cửu", "B": "Đồng chí Nguyễn Ái Quốc", "C": "Đồng chí Trần Phú", "D": "Đồng chí Lê Hồng Phong"}, "answer": "B"}, {"id": 75, "question": "Thực dân Pháp nổ súng xâm lược nước ta vào thời gian nào?", "options": {"A": "Năm 1854", "B": "Năm 1856", "C": "Năm 1858", "D": "Năm 1860"}, "answer": "C"}, {"id": 76, "question": "Địa phương - nơi thực dân Pháp nổ súng đầu tiên xâm lược nước ta là:", "options": {"A": "Sài Gòn - Gia Định", "B": "Thừa Thiên Huế", "C": "Thành phố Hà Nội", "D": "Quảng Nam - Đà Nẵng"}, "answer": "D"}, {"id": 77, "question": "Triều đình nhà Nguyễn ký Hiệp ước Giáp Thân (Hiệp ước Patơnốt) đầu hàng, dâng nước ta cho thực dân Pháp vào thời gian nào?", "options": {"A": "Năm 1883", "B": "Năm 1884", "C": "Năm 1885", "D": "Năm 1886"}, "answer": "B"}, {"id": 78, "question": "Luận cương chính trị tháng 10/1930 của Đảng do ai khởi thảo?", "options": {"A": "Đồng chí Trường Chinh", "B": "Đồng chí Nguyễn Ái Quốc", "C": "Đồng chí Trần Phú", "D": "Đồng chí Lê Hồng Phong"}, "answer": "C"}, {"id": 79, "question": "Sự kiện nào được coi là cuộc diễn tập lần thứ nhất chuẩn bị cho Cách mạng tháng Tám năm 1945?", "options": {"A": "Cao trào cách mạng 1939 - 1945", "B": "Cao trào đấu tranh đòi dân sinh, dân chủ 1936 - 1939", "C": "Cao trào cách mạng 1930 - 1931", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 80, "question": "Sau khi Cách mạng tháng Tám năm 1945 thành công, nước ta có tên gọi là gì?", "options": {"A": "Việt Nam", "B": "Cộng hòa Xã hội chủ nghĩa Việt Nam", "C": "Việt Nam Dân chủ Cộng hòa", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 81, "question": "Nước ta đi lên ch ủ nghĩa xã hội từ một nước nông nghiệp nghèo nàn lạc hậu. Cho nên công nghiệp hóa hiện đại hóa đất nước là:", "options": {"A": "Là nhiệm vụ cần thiết, cấp bách", "B": "Không thật sự cần thiết", "C": "Là việc làm bình thường", "D": "Là nhiệm vụ không khó khăn nhiều"}, "answer": "A"}, {"id": 82, "question": "Yếu tố nào là căn cứ trực tiếp xác định thành phần kinh tế?", "options": {"A": "Sở hữu tư liệu sản xuất", "B": "Vốn", "C": "Khoa học kỹ thuật", "D": "Yếu tố khác"}, "answer": "A"}, {"id": 83, "question": "Nền kinh tế thị trường được xây dựng và phát triển ở Việt Nam hiện nay là:", "options": {"A": "Cơ chế thị trường có sự điều tiết của nhà nước", "B": "Kinh tế thị trường phát triển theo định hướng xã hội chủ nghĩa", "C": "Nền kinh tế thị trường xã hội chủ nghĩa", "D": "Dân giàu, nước mạnh, dân chủ, công bằng, văn minh"}, "answer": "B"}, {"id": 84, "question": "Vai trò của khoa học công nghệ đối với công nghiệp hóa,", "options": {"A": "Động lực của công nghiệp hóa, hiện đại hóa", "B": "Điều kiện tiên quyết của công nghiệp hóa, hiện đại hóa", "C": "Quyết định tốc độ và kết quả của công nghiệp hóa, hiện đại hóa", "D": "Tất cả đều đúng"}, "answer": "A"}, {"id": 85, "question": "Kinh tế nhà nước và kinh tế tập thể ở nước ta có vai trò:", "options": {"A": "Đóng vai trò chủ đạo trong nền kinh tế quốc dân", "B": "Đóng vai trò quan trọng trong nền kinh tế nhiều thành phần", "C": "Là nền tảng của chế độ mới", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 86, "question": "Đại hội XI của Đảng (2011) xác định nền kinh tế ở nước ta hiện nay có mấy thành phần kinh tế?", "options": {"A": "Có 2 thành phần kinh tế", "B": "Có 3 thành phần kinh tế", "C": "Có 4 thành phần kinh tế", "D": "Có 5 thành phần kinh tế"}, "answer": "C"}, {"id": 87, "question": "Trong nền kinh tế thị trường định hướng xã hội chủ nghĩa, thành phần kinh tế đóng vai trò chủ đạo là:", "options": {"A": "Kinh tế nhà nước và kinh tế tập thể", "B": "Kinh tế tư nhân", "C": "Kinh tế nhà nước", "D": "Kinh tế có vốn đầu tư nước ngoài"}, "answer": "C"}, {"id": 88, "question": "Công nghiệp hóa, hiện đại hóa là nhiệm vụ trung tâm trong suốt thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam vì:", "options": {"A": "Nước ta đi lên chủ nghĩa xã hội từ một nước chưa có công nghiệp", "B": "Công nghiệp hóa, hiện đại hóa tạo ra cơ sở vật chất kỹ thuật hiện đại cho chủ nghĩa xã hội", "C": "Tầm quan trọng của công nghiệp hóa, hiện đại hóa đối với chủ nghĩa xã hội", "D": "Thời kỳ quá độ là thời kỳ xây dựng cơ sở vật chất kỹ thuật cho chủ nghĩa xã hội"}, "answer": "B"}, {"id": 89, "question": "Kinh tế nhà nước gồm:", "options": {"A": "Gồm có đất đai, tài nguyên, ngân sách nhà nước, dự trữ quốc gia, các quỹ của nhà nước", "B": "Gồm có các doanh nghiệp nhà nước", "C": "Bao gồm phần kinh doanh có vốn của nhà nước", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 90, "question": "Công nghiệp hóa, hiện đại hóa là:", "options": {"A": "Quá trình chuyển đối căn bản, toàn diện các hoạt động sản xuất kinh doanh, dịch vụ, quản lý kinh tế, xã hội", "B": "Từ lao động thủ công là chính sang sử dụng một cách phổ biến sức lao động với công nghệ, phương tiện và phương pháp tiên tiến hiện đại", "C": "Dựa trên sự phát triển công nghiệp và tiến bộ khoa học, công nghệ, tạo ra năng suất lao động xã hội cao", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 91, "question": "Kinh tế tri thức là:", "options": {"A": "Nền kinh tế dựa vào trí tuệ của con người", "B": "Nền kinh tế dựa vào tiềm năng của con người", "C": "Nền kinh tế trong đó sự sản sinh, phổ cập và sử dụng tri thức giữ vai trò quyết định nhất đối với sự phát triển kinh tế, tạo ra của cải, nâng cao chất lượng cuộc sống", "D": "Nền kinh tế dựa vào nguồn lực con người và công nghệ cao"}, "answer": "C"}, {"id": 92, "question": "Trong nền kinh tế thị trường định hướng xã hội chủ nghĩa, công nghiệp hóa - hiện đại hóa là:", "options": {"A": "Sự nghiệp của nhà nước và các doanh nghiệp nhà nước", "B": "Sự nghiệp của nhà nước và các doanh nghiệp liên doanh", "C": "Sự nghiệp của toàn dân, của mọi thành phần kinh tế, trong đó kinh tế nhà nước là chủ đạo", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 93, "question": "Ở Việt Nam, nền kinh tế thị trường định hướng xã hội chủ nghĩa là:", "options": {"A": "Nền kinh tế quản lý theo kiểu tập trung, quan liêu bao cấp", "B": "Nền kinh tế hiện vật", "C": "Nền kinh tế vừa hoạt động theo những quy luật của nền kinh tế thị trường, vừa được dẫn dắt bởi các nguyên tắc của chủ nghĩa xã hội", "D": "Về thực chất là nền kinh tế thị trường tư bản chủ nghĩa"}, "answer": "C"}, {"id": 94, "question": "Động lực của công nghiệp hóa, hiện đại hóa là:", "options": {"A": "Phát triển kinh tế thị trường", "B": "Mở rộng quan hệ kinh tế quốc tế", "C": "Đầu tư nước ngoài", "D": "Khoa học và công nghệ"}, "answer": "D"}, {"id": 95, "question": "Kinh tế nhà nước cùng với ... ngày càng trở thành nền tảng vững chắc của nền kinh tế quốc dân:", "options": {"A": "Kinh tế Tập thể", "B": "Kinh tế Cá thể", "C": "Kinh tế Tư nhân", "D": "Kinh tế có vốn đầu tư nước ngoài"}, "answer": "A"}, {"id": 96, "question": "Trong nền kinh tế thị trường định hướng xã hội chủ nghĩa ở nước ta hiện nay, hình thức phân phối nào là chủ yếu:", "options": {"A": "Phân phối theo lao động, hiệu quả kinh tế và đảm bảo tái sản xuất sức lao động", "B": "Phân phối theo nhu cầu", "C": "Phân phối là một khâu quan trọng trong quá trình tái sản xuất xã hội", "D": "Tất cả đều đúng"}, "answer": "A"}, {"id": 97, "question": "Việc chấm dứt tình trạng khủng hoảng về đường lối cứu nước ở Việt Nam đầu thế kỷ XX được đánh dấu bằng sự kiện:", "options": {"A": "Nguyễn Ái Quốc thành lập Hội Việt Nam Cách mạng Thanh niên", "B": "Cuộc khởi nghĩa Yên Bái thất bại và sự tan rã của Việt Nam Quốc dân Đảng", "C": "Nguyễn Ái Quốc gửi đến Hội nghị Véc-xai \"Bản yêu sách của nhân dân An Nam\"", "D": "Đảng Cộng sản Viêt Nam được thành lập với Cương lĩnh chính trị đúng đắn"}, "answer": "D"}, {"id": 98, "question": "Trong các nhân tố tăng trường kinh tế, Đảng ta xác định nhân tố cơ bản của tăng trưởng nhanh và bền vững là:", "options": {"A": "Vốn", "B": "Con người", "C": "Khoa học và công nghệ", "D": "Cơ cấu kinh tế, thể chế kinh tế và vai trò nhà nước"}, "answer": "B"}, {"id": 99, "question": "Tại sao Công nghiệp hóa- Hiện đại hóa là quy luật bắt buộc, là nhiệm vụ trung tâm của nước ta trong suốt thời kỳ quá độ lên chủ nghĩa xã hội?", "options": {"A": "Do yêu cầu phải xây dựng vật chất - kỹ thuật của chủ nghĩa xã hội", "B": "Do yêu cầu phải rút ngắn khoảng cách tụt hậu về kinh tế, kỹ thuật - công nghệ giữa nước ta với các nước trong khu vực thế giới", "C": "Do yêu cầu phải tạo ra năng suất lao động xã hội cao, đảm bảo cho sự tồn tại và phát triển của chủ nghĩa xã hội", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 100, "question": "Quan hệ giữa công nghiệp hóa, hiện đại hóa nền kinh tế quốc dân với xây dựng cơ sở vật chất kỹ thuật của chủ nghĩa xã hội là:", "options": {"A": "Công nghiệp hóa, hiện đại hóa tạo lập cơ sở vật chất kỹ thuật của chủ nghĩa xã hội", "B": "Công nghiệp hóa, hiện đại hóa hỗ trợ cơ sở vật chất kỹ thuật của chủ nghĩa xã hội", "C": "Công nghiệp hóa, hiện đại hóa phụ thuộc cơ sở vật chất kỹ thuật của chủ nghĩa xã hội", "D": "Công nghiệp hóa, hiện đại hóa tác động qua lại một cách biện chứng với cơ sở vật chất kỹ thuật của chủ nghĩa xã hội"}, "answer": "A"}, {"id": 101, "question": "Việt Nam gia nhập WTO và tham gia tổ chức kinh tế APEC (diễn đàn hợp tác kinh tế châu Á - Thái Bình Dương) thì việc công nghiệp hóa, hiện đại hóa đất nước là việc làm:", "options": {"A": "Cần thiết và cấp bách", "B": "Bình thường", "C": "Cần phải xem xét", "D": "Tất cả đều đúng"}, "answer": "A"}, {"id": 102, "question": "Chủ trương: \"Xây dựng quan hệ đối tác với các nước\" được Đảng ta đề ra tại:", "options": {"A": "Đại hội VI (1986)", "B": "Đại hội VII (1991)", "C": "Đại hội VIII (1996)", "D": "Đại hội XI (2011)"}, "answer": "C"}, {"id": 103, "question": "Trong cương lĩnh đư ợc đại hội XI của Đảng thông qua, nền văn hóa nư ớc ta có những đặc trưng nào?", "options": {"A": "Tiên tiến", "B": "Đậm đà bản sắc dân tộc", "C": "A, B đều đúng", "D": "A, B đều sai"}, "answer": "C"}, {"id": 104, "question": "Ngày 10/3 âm lịch hằng năm là ngày:", "options": {"A": "Giỗ tổ Hùng Vương", "B": "Giỗ tổ Thánh Gióng", "C": "Giỗ tổ Đức Thánh Trần", "D": "Giỗ tổ làng nghề"}, "answer": "A"}, {"id": 105, "question": "Toàn bộ những giá trị vật chất và tinh thần do con người tạo ra bằng lao động và hoạt động thực tiễn trong quá trình lịch sử của minh gọi là:", "options": {"A": "Vật chất", "B": "Ý thức", "C": "Văn hóa", "D": "Văn học"}, "answer": "C"}, {"id": 106, "question": "Ngôn ngữ, tư tưởng, giá trị,.. thuộc khía cạnh văn hóa:", "options": {"A": "Văn hóa vật chất", "B": "Văn hóa phi vật chất", "C": "Văn hóa hỗn hợp", "D": "Văn hóa vật chất lẫn tinh thần"}, "answer": "B"}, {"id": 107, "question": "Ai không phải là danh nhân văn hóa thế giới trong những đại biểu sau đây?", "options": {"A": "Nguyễn Du", "B": "Nguyễn Khuyến", "C": "Nguyễn Trãi", "D": "Hồ Chí Minh"}, "answer": "B"}, {"id": 108, "question": "Tìm một di sản văn hóa không cùng loại hình với các di sản văn hóa còn lại?", "options": {"A": "Phong Nha - Kẻ Bàng", "B": "Quan họ Bắc Ninh", "C": "Nhã Nhạc cung đình Huế", "D": "Không gian văn hóa cồng chiêng Tây Nguyên"}, "answer": "A"}, {"id": 109, "question": "Điền từ còn thiếu vào chỗ trống: \"... là động lực thúc đẩy sự phát triển xã hội\".", "options": {"A": "Văn hiến", "B": "Văn hóa", "C": "Văn vật", "D": "Văn chương"}, "answer": "B"}, {"id": 110, "question": "Bản sắc văn hóa dân tộc Việt Nam bao gồm:", "options": {"A": "Lòng yêu nước", "B": "Tinh thần đoàn kết", "C": "Đức tính cần cù sáng tạo trong lao động", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 111, "question": "Di sản văn hóa phi vật thể là:", "options": {"A": "Cây đa Tân Trào", "B": "Lễ hội chùa Hương", "C": "Vịnh Hạ Long", "D": "Quốc Tử Giám"}, "answer": "B"}, {"id": 112, "question": "Hát quan họ là nét văn hóa độc đáo của:", "options": {"A": "Tỉnh Bắc Ninh", "B": "Tỉnh Hà Tây", "C": "Tỉnh Bắc Giang", "D": "Tỉnh Hà Đông"}, "answer": "A"}, {"id": 113, "question": "Nước Việt Nam có bao nhiêu dân tộc khác nhau?", "options": {"A": "53 dân tộc", "B": "54 dân tộc", "C": "55 dân tộc", "D": "56 dân tộc"}, "answer": "B"}, {"id": 114, "question": "Mâu thuẫn vừa cơ bản vừa chủ yếu trong xã hội Việt Nam dư ới thời Thực dân Pháp thống trị là:", "options": {"A": "Nhân dân, chủ yếu là nông dân với địa chủ", "B": "Công nhân với tư bản", "C": "Toàn thể nhân dân Việt Nam với thực dân Pháp", "D": "Công nhân, nông dân với địa chủ và thực dân Pháp"}, "answer": "C"}, {"id": 115, "question": "Sự kiện được Nguyễn Ái Quốc đánh giá \"như tiếng sét đã đánh thức nhân dân châu Á tỉnh giấc mơ hàng thế kỷ\" là:", "options": {"A": "Cách mạng Tháng 10 năm 1917 ở Nga giành thắng lợi", "B": "Sự thành lập của Quốc tế cộng sản", "C": "Sự ra đời của Hội Quốc tế Nông Dân", "D": "Cách mạng Tân Hợi"}, "answer": "A"}, {"id": 116, "question": "Tính chất của xã hội Việt Nam dưới sự thống trị của thực dân Pháp là:", "options": {"A": "Xã hội thuộc địa", "B": "Xã hội nửa phong kiến", "C": "Xã hội có giai cấp", "D": "Xã hội thuộc địa, nửa phong kiến"}, "answer": "D"}, {"id": 117, "question": "Những giai cấp bị trị ở Việt Nam dưới chế độ thuộc địa của Pháp bao gồm:", "options": {"A": "Công nhân và nông dân", "B": "Công nhân, nông dân, tiểu tư sản, tư sản dân tộc", "C": "Công nhân, nông dân, tiểu tư sản", "D": "Công nhân, nông dân, tiểu tư sản, tư sản dân tộc, địa chủ vừa và nhỏ"}, "answer": "D"}, {"id": 118, "question": "Vì sao phải xây dựng nền quốc phòng toàn dân?", "options": {"A": "Là quy luật khách quan trong xây dựng và bảo vệ Tổ Quốc", "B": "Vì địch xâm lược", "C": "Bảo vệ là một công đoạn của sản xuất và đời sống", "D": "Vì ta yếu"}, "answer": "A"}, {"id": 119, "question": "Lực lượng chủ lực để bảo vệ Tổ quốc Việt Nam hiện nay là:", "options": {"A": "Gồm các lực lượng của toàn dân", "B": "Là các lực lượng vũ trang nhân dân", "C": "Là ba thứ quân: bộ đội chủ lực, bộ đội địa phương và dân quân tự vệ", "D": "Các lực lượng dự bị động viên"}, "answer": "A"}, {"id": 120, "question": "Nguyên tắc Đảng lãnh đạo Quân đội nhân dân Việt Nam là:", "options": {"A": "Tuyệt đối, trực tiếp về mọi mặt", "B": "Tuyệt đối và trực tiếp", "C": "Tuyệt đối", "D": "Trực tiếp về mọi mặt"}, "answer": "A"}, {"id": 121, "question": "Phương châm xây dựng quân đội ta được Đảng khẳng định trong các kỳ Đại hội là:", "options": {"A": "Xây dựng quân đội nhân dân cách mạng, chính quy, tinh nhuệ, từng bước hiện đại", "B": "Lập tức mua sắm vũ khí trang bị hiện đại cho quân đội", "C": "Xây dựng quân đội theo hướng chuyên nghiệp, nhà nghề", "D": "Chú trọng xây dựng đời sống văn hóa tinh thần của quân đội"}, "answer": "A"}, {"id": 122, "question": "Mục tiêu, nhiệm vụ của quốc phòng, an ninh là:", "options": {"A": "Bảo vệ vững chắc độc lập, chủ quyền, thống nhất, toàn vẹn lãnh thổ của Tổ quốc", "B": "Bảo vệ Đảng, Nhà nước, nhân dân và chế độ xã hội chủ nghĩa, giữ vững hòa bình, ổn định chính trị và an ninh quốc gia, trật tự, an toàn xã hội", "C": "Chủ động đấu tranh, làm thất bại mọi âm muu và hành động chống phá của các thế lực thù địch đối với sự nghiệp cách mạng của nhân dân ta.", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 123, "question": "Pháp luật quy định củng cố quốc phòng, bảo vệ an ninh quốc gia là nhiệm vụ của:", "options": {"A": "Công an nhân dân", "B": "Toàn dân", "C": "Quân đội nhân dân", "D": "Công dân"}, "answer": "B"}, {"id": 124, "question": "Một trong những nhiệm vụ của quốc phòng và an ninh là gì:", "options": {"A": "Phát huy sức mạnh của nhân dân", "B": "Phát huy sức mạnh của Nhà nước", "C": "Phát huy sức mạnh của khối đại đoàn kết toàn dân tộc", "D": "Phát huy sức mạnh của Đảng"}, "answer": "C"}, {"id": 125, "question": "Quan điểm sức mạnh dân tộc trong chính sách quốc phòng và an ninh đư ợc hiểu là:", "options": {"A": "Truyền thống đánh giặc của ông cha ta", "B": "Quân đội chính quy hiện đại", "C": "Những truyền thống tốt đẹp, sức mạnh của văn hóa tinh thần và sức mạnh vật chất của dân tộc", "D": "Nền kinh tế hiện đại"}, "answer": "C"}, {"id": 126, "question": "Việt Nam là thành viên thứ mấy của Tổ chức Thương mại thế giới (WTO)?", "options": {"A": "Thành viên thứ 140", "B": "Thành viên thứ 150", "C": "Thanh viên thứ 160", "D": "Thành viên thứ 170"}, "answer": "B"}, {"id": 127, "question": "Tích cực hội nhập quốc tế là:", "options": {"A": "Khẩn trương chuẩn bị, điều chỉnh đổi mới bên trong từ phương thức lãnh đạo, quản lý đến hoạt động thực tiễn", "B": "Hoàn toàn chủ động quyết định đường lối hội nhập kinh tế quốc tế", "C": "Dự báo những tình huống thuận lợi và khó khăn khi hội nhập", "D": "Sẵn sàng quan hệ tốt đẹp với mọi người"}, "answer": "A"}, {"id": 128, "question": "Ý ki ến nào dư ới đây là đúng về trách nhiệm tham gia xây dựng Nhà nư ớc pháp quyền xã hội chủ nghĩa ?", "options": {"A": "Mọi công đân đều phải có trách nhiệm tham gia xây dựng và bảo vệ Nhà nước.", "B": "Chỉ cán bộ, công chức nhà nước mới có trách nhiemj tham gia xây dựng Nhà nước.", "C": "Xây dựng và bảo vệ nhà nước là trách nhiệm của lực lượng công an nhân dân.", "D": "Chỉ lực lượng quân đội nhân dân mới có trách nhiệm xây dựng và bảo vệ nhà nước."}, "answer": "A"}, {"id": 129, "question": "Việt Nam gia nh ập diễn đàn hợp tác kinh tế châu Á – Thái Bình Dương (APEC) vào thời gian nào?", "options": {"A": "Năm 1997", "B": "Năm 1999", "C": "Năm 1998", "D": "Năm 2000"}, "answer": "C"}, {"id": 130, "question": "Mục tiêu, nhiệm vụ đối ngoại, hội nhập kinh tế của Việt Nam trong thời kỳ đổi mới là:", "options": {"A": "Lấy việc giữ vững môi trường hòa bình, ổn định; tạo các điều kiện quốc tế thuận lợi cho công cuộc đổi mới, để phát triển kinh tế - xã hội là lợi ích cao nhất của Tổ quốc.", "B": "Giữ vững môi trường hòa bình, tạo điều kiện quốc tế thuận lợi cho công cuộc đổi mới", "C": "Giữ vững ổn định chính trị xã hội", "D": "Giữ vững độc lập tự chủ tự cường đi đôi với đa phương hóa đa dạng hóa quan hệ đối ngoại"}, "answer": "A"}, {"id": 131, "question": "Nước ta đứng trước những thách thức gì trong việc mở rộng quan hệ hợp tác quốc tế:", "options": {"A": "Phân hóa giàu nghèo, dịch bệnh, tội phạm xuyên quốc gia", "B": "Chịu sức ép cạnh tranh gay gắt", "C": "Những biến động trên thị trường quốc tế tác động đến thị trường trong nước", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 132, "question": "Sự kiện đánh dấu sự hội nhập của nước ta với khu vực Đông Nam Á là:", "options": {"A": "Vào tháng 07 năm 1995 Việt Nam gia nhập ASEAN", "B": "Vào năm 1976 Việt Nam đặt quan hệ ngoại giao cuối cùng với Thái Lan và Philipin", "C": "Vào năm 1986 Việt Nam đồng ý cho các nước Đông Nam Á vào buôn bán", "D": "Tất cả đều đúng"}, "answer": "A"}, {"id": 133, "question": "Toàn cầu hóa có những tác động tiêu cực:", "options": {"A": "Chi phối quá trình toàn cầu hóa tạo nên sự bất bình đẳng trong quan hệ quốc tế; Làm gia tăng sự phân hóa giu nghèo", "B": "Các nước nông nghiệp sẽ bị các nước công nghiệp thao túng", "C": "Ônhiễm môi trường, tài nguyên thiên nhiên bị cạn kiệt", "D": "Dân số sẽ gia tăng, nạn đói có nguy cơ sẽ diễn ra khắp nơi"}, "answer": "A"}, {"id": 134, "question": "Mục tiêu đối ngoại của việc mở rộng đối ngoại và hội nhập kinh tế quốc tế trong thời kỳ đổi mới là:", "options": {"A": "Làm giảm nguồn lực đáp ứng yêu cầu phát triển của đất nước", "B": "Phát huy vai trò làm chủ tập thể của nhân dân lao động", "C": "Kết hợp nội lực với các nguồn lực bên ngoài tạo thành nguồn lực tổng hợp để đẩy mạnh công nghiệp hóa, hiện đại hóa; thực hiện dân giàu, nước mạnh, xã hội công bằng, dân chủ, văn minh", "D": "Đầu tư nước ngoài chiếm tỷ trọng 90% trong nền kinh tế quốc dân"}, "answer": "C"}, {"id": 135, "question": "Đường lối đối ngoại, hội nhập kinh tế quốc tế thời kì đổi mới bộc lộ những hạn chế:", "options": {"A": "Còn lúng túng, bị động, chưa xây dựng quan hệ lợi ích đan xen", "B": "Chưa hình thành được kế hoạch tổng thể và dài hạn về hội nhập kinh tế quốc tế", "C": "Đội ngũ cán bộ lĩnh vực đối ngoại nhìn chung chưa đáp ứng được nhu cầu cả về số lượng và chất lượng", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 136, "question": "Thực chất vấn đề dân tộc thuộc địa trong Tư tưởng Hồ Chí Minh là ?", "options": {"A": "Đấu tranh giải phóng dân tộc khỏi sự áp bức, thống trị của nước ngoài, giành độc lập dân tộc, thành lập nhà nước dân tộc độc lập, và đưa đất nước phát triển theo xu thế thời đại.", "B": "Đòi quyền tự do dân chủ tối thiểu cho nhân dân.", "C": "Bình đẳng dân tộc.", "D": "Đòi quyền dân tộc tiến bộ."}, "answer": "A"}, {"id": 137, "question": "Theo tư tưởng của Hồ Chí Minh độc lập tự do là:", "options": {"A": "Quyền bình đẳng của tất cả các dân tộc.", "B": "Quyền sống của tất cả các dân tộc.", "C": "Quyền thiêng liêng và bất khả xâm phạm của tất cả các dân tộc.", "D": "Quyền nói lên tiếng nói của riêng mình."}, "answer": "C"}, {"id": 138, "question": "Theo tư tưởng Hồ Chí Minh, Muốn cứu nước và giải phóng dân tộc, không có con đường nào khác ngoài con đường ?", "options": {"A": "Cách mạng vô sản.", "B": "Cách mạng tư sản.", "C": "Cách mạng dân tộc.", "D": "Cách mạng dân chủ."}, "answer": "A"}, {"id": 139, "question": "Ngày 10/11/1991, Việt Nam bình thường hóa quan hệ với:", "options": {"A": "Bình thường hóa quan hệ với Trung Quốc", "B": "Bình thường hóa quan hệ với Liên xô", "C": "Bình thường hóa quan hệ với Campuchia", "D": "Bình thường hóa quan hệ với Nhật"}, "answer": "A"}, {"id": 140, "question": "Tại Hội nghị hợp nhất các tổ chức công sản thành lập Đảng Cộng sản Việt Nam (3/2/1930), chỉ có đại diện của An Nam Cộng sản Đảng và Đông Dương Cộng sản Đảng tham dự. Đông Dương Cộng sản liên đoàn chính thức gia nhập Đảng Cộng sản Việt Nam vào:", "options": {"A": "Ngày 07 tháng 2 năm 1930", "B": "Ngày 22 tháng 2 năm 1930", "C": "Ngày 23 tháng 2 năm 1930", "D": "Ngày 24 tháng 2 năm 1930"}, "answer": "D"}, {"id": 141, "question": "Sau thắng lợi năm 1975, Đảng ta nhận định: \"Hệ thống các nước xã hội chủ nghĩa đã và đang lớn mạnh không ngừng, phong trào độc lập dân tộc và phong trào... đang trên đà phát triển mãnh liệt\". Chọn đáp án đúng điền vào ô trống:", "options": {"A": "Cách mạng của giai cấp công nhân", "B": "Đấu tranh giải phóng dân tộc", "C": "Đấu tranh giành chính quyền", "D": "Bình dân học vụ"}, "answer": "A"}, {"id": 142, "question": "Đâu là cốt lỗi của một nền văn hóa:", "options": {"A": "Sự cần cù, chăm chỉ", "B": "Lòng yêu nước", "C": "Hệ giá trị của dân tộc", "D": "Lòng nhân ái"}, "answer": "B"}, {"id": 143, "question": "Nhà nước pháp quyền xã hội chủ nghĩa quản lý mọi mặt đời sống xã hội chủ yếu bằng:", "options": {"A": "Đường lối chính sách", "B": "Tuyên truyền giáo dục", "C": "Hiến pháp, pháp luật", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 144, "question": "Điền từ còn thiếu vào chỗ trống: \"Nhà nước xã hội chủ nghĩa vừa có bản chất giai cấp công nhân, vừa có tính nhân dân rộng rãi và tính ... sâu sắc\":", "options": {"A": "Giai cấp", "B": "Nhân đạo", "C": "Dân tộc", "D": "Cộng đồng"}, "answer": "C"}, {"id": 145, "question": "Mặt trận Tổ quốc Việt Nam và các tố chức chính trị xã hội có vai trò gì trong việc thực hiện quyền làm chủ của nhân dân?", "options": {"A": "Tập hợp, vận động, đoàn kết rộng rãi các tầng lớp nhân dân", "B": "Đại diện cho quyền và lợi ích hợp pháp của nhân dân", "C": "Đề xuất các chủ trương, chính sách về kinh tế, văn hóa, an ninh, quốc phòng", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 146, "question": "Nhà nước pháp quyền xã hội chủ nghĩa Việt Nam có mấy đặc trưng cơ bản:", "options": {"A": "4 đặc trưng", "B": "5 đặc trưng", "C": "6 đặc trưng", "D": "7 đặc trưng"}, "answer": "C"}, {"id": 147, "question": "Đặc trưng đầu tiên của nhà nước pháp quyền xã hội chủ nghĩa Việt Nam là:", "options": {"A": "Nhà nước của dân, do dân và vì dân; tất cả quyền lực nhà nước thuộc về nhân dân", "B": "Quyền lực nhà nước là thống nhất, có sự phân công rành mạch và phối hợp chặt chẽ giữa các cơ quan nhà nước trong việc thực hiện các quyền lập pháp, hành pháp và tư pháp", "C": "Nhà nước được tổ chức và hoạt động trên cơ sở Hiến pháp, pháp luật và bảo đảm cho Hiến pháp và các đạo luật giữ vị trí tối thượng trong điều chỉnh các quan hệ thuộc tất cả các lĩnh vực của đời sống xã hội", "D": "Nhà nước tôn trọng và bảo đảm quyền con người, quyền công dân; nâng cao trách nhiệm pháp lý giữa Nhà nước và công dân; thực hành dân chủ, đồng thời tăng cường kỷ cương, kỷ luật"}, "answer": "A"}, {"id": 148, "question": "Hệ thống chính trị ở nước ta hiện nay bao gồm:", "options": {"A": "Đảng Cộng sản Việt Nam", "B": "Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam", "C": "Mặt trận Tổ quốc Việt Nam và các đoàn thể nhân dân", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 149, "question": "Cơ quan hành chính nhà nước cao nhất của nước Cộng hòa xã hội chủ nghĩa Việt Nam là:", "options": {"A": "Quốc hội", "B": "Đảng Cộng sản Việt Nam", "C": "Chính phủ", "D": "Hội đồng nhân dân"}, "answer": "C"}, {"id": 150, "question": "Chính phủ là cơ quan:", "options": {"A": "Chấp hành của Quốc hội", "B": "Hành pháp", "C": "Lập pháp", "D": "Tất cả đều đúng"}, "answer": "B"}, {"id": 151, "question": "Tòa án, Viện kiểm sát được gọi là cơ quan:", "options": {"A": "Cơ quan hành pháp", "B": "Cơ quan tư pháp", "C": "Cơ quan lập pháp", "D": "Tất cả đều đúng"}, "answer": "B"}, {"id": 152, "question": "Tận dụng được bối cảnh phát xít Nh ật đầu hàng Đồng Minh, quân Nh ật ở Đông Dương hoang mang cực điểm, chính quy ền tay sai Nh ật nhanh chóng tan rã để thực hiện thắng lợi Cách mạng tháng Tám 1945 chứng tỏ điều gì ?", "options": {"A": "Đảng có nghệ thuật tài giỏi về chuẩn bị, bám sát và chớp thời cơ.", "B": "Đảng có phương pháp cách mạng đúng đắn, dự báo đúng, bám sát tình hình.", "C": "Đảng đã chỉ đạo kiên quyết, khôn khéo, bi ết tạo nên sức mạnh tổng hợp để áp đảo kẻ thù và quyết tâm lãnh đạo quần chúng khởi nghĩa giành chính quyền.", "D": "Đảng có lý luận Mác – Lênin soi đường gắn với thực tiễn đấu tranh tạo nên sức mạnh tổng hợp."}, "answer": "A"}, {"id": 153, "question": "Việc thực hiện quyền lực trong nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam có sự:", "options": {"A": "Phân chia quyền lực", "B": "Quyền lực nhà nước là thống nhất, có sự phân công rành mạch và phối hợp chặt chẽ giữa các cơ quan nhà nước trong việc thực hiện các quyền lập pháp, hành pháp và tư pháp", "C": "Ba quyền hành pháp, lập pháp, tư pháp giao cho các cơ quan Chính phủ, Tòa án", "D": "Tất cả đều đúng"}, "answer": "B"}, {"id": 154, "question": "Bản chất Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam được thể hiện:", "options": {"A": "Tất cả quyền lực nhà nước thuộc về nhân dân", "B": "Là nhà nước của nhân dân, do nhân dân, vì nhân dân", "C": "Nhà nước ta mang bản chất của Giai cấp công nhân, tính nhân dân rộng rãi và tính dân tộc sâu sắc", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 155, "question": "Chức năng tổ chức xây dựng của nhà nước pháp quyền xã hội chủ nghĩa Việt Nam bao gồm:", "options": {"A": "Tổ chức xây dựng và quản lý nền kinh tế xã hội chủ nghĩa", "B": "Tổ chức xây dựng và quản lý văn hóa, giáo dục, khoa học", "C": "Tổ chức xây dựng và bảo đảm thực hiện các chính sách xã hội", "D": "Tất cả đều đúng"}, "answer": "D"}, {"id": 156, "question": "Điền từ còn thiếu vào chỗ trống: \"Nhà nước được tổ chức và hoạt động trên cơ sở ... pháp luật và bảo đảm cho Hiến pháp và các đạo luật giữ vị trí tối thượng trong điều chỉnh các quan hệ thuộc tất cả các lĩnh vực của đời sống xã hội\":", "options": {"A": "Hiến pháp", "B": "Pháp luật", "C": "Nghị định", "D": "Nghị quyết"}, "answer": "A"}, {"id": 157, "question": "Theo chủ trương của Đảng xây dựng và phát tri ển văn hóa – xã hội phải đi kèm với:", "options": {"A": "Phát triển và xây dựng kinh tế vững mạnh", "B": "Phát triển ngoại giao tốt đẹp với các nước đặc biệt là các nước xã hội chủ nghĩa", "C": "Phát triển khoa học công nghệ hiện đại", "D": "Phát triển và xây dựng chủ nghĩa xã hội trong thời kỳ quá độ"}, "answer": "A"}, {"id": 158, "question": "Giải thưởng cao quý nhất của nước ta hiện nay tặng cho các văn nghệ sĩ có những cống hiển xuất sắc trên lĩnh vực văn học - nghệ thuật và khoa học - công nghệ là:", "options": {"A": "Giải thưởng Bông sen vàng", "B": "Giải thưởng Cánh diều vàng", "C": "Giải thưởng Hồ Chí Minh", "D": "Giải thưởng Sao vàng đất Việt"}, "answer": "C"}, {"id": 159, "question": "Nội dung nào th ể hiện sự kế thừa tinh hoa của học thuyết pháp quyền trong nhà nước xã hội chủ nghĩa:", "options": {"A": "Có ba cơ quan lập pháp, hành pháp và tư pháp", "B": "Các cơ quan này thực hiện những chức năng khác nhau", "C": "Mối quan hệ giữa các cơ quan nhà nước là phụ thuộc", "D": "Thực hiện phân công, phân nhiệm giữa các cơ quan nhà nước"}, "answer": "D"}, {"id": 160, "question": "Đặc trưng cơ bản của bộ máy nhà nước xã hội chủ nghĩa là:", "options": {"A": "Quyền lực tập trung, thống nhất", "B": "Có Đảng Cộng sản lãnh đạo", "C": "Quyền lực nhà nước thuộc về nhân dân", "D": "Có sự tham gia của nhân dân vào bộ máy nhà nước"}, "answer": "B"}, {"id": 161, "question": "Nhà nước pháp quyền khác với nhà nước pháp trị ở:", "options": {"A": "Nhà nước pháp quyền quản lý xã hội bằng pháp luật", "B": "Nhà nước pháp quyền đặt ra pháp luật", "C": "Nhà nước pháp quyền bị ràng buộc bởi pháp luật", "D": "Pháp luật được thực hiện triệt để"}, "answer": "C"}, {"id": 162, "question": "Nhà nước pháp quyền là:", "options": {"A": "Nhà nước cai trị bằng pháp luật và không chịu sự ràng buộc bởi pháp luật", "B": "Nhà nước quản lý xã hội bằng pháp luật và không bị hạn chế bởi pháp luật", "C": "Nhà nước chịu sự ràng buộc bởi pháp luật và không cai trị bằng pháp luật", "D": "Nhà nước quản lý xã hội bằng pháp luật và bị ràng buộc bởi luật pháp"}, "answer": "D"}, {"id": 163, "question": "Trọng tâm của đổi mới hệ thống chính trị là:", "options": {"A": "Đổi mới tổ chức và phương thức lãnh đạo của các bộ phận cấu thành hệ thống", "B": "Đổi mới tổ chức và phương thức lãnh đạo của cơ quan cầm quyền", "C": "Đổi mới tổ chức và phương thức lãnh đạo của Đảng", "D": "Đổi mới tổ chức và phương thức lãnh đạo của Quốc hội"}, "answer": "C"}, {"id": 164, "question": "Nhà nước ban hành cơ chế để Mặt trận Tổ quốc và các tổ chức chính trị thực hiện tốt vai trò:", "options": {"A": "Giám sát và phản biện xã hội", "B": "Giám sát", "C": "Phản biện xã hội", "D": "Kiểm sát"}, "answer": "A"}, {"id": 165, "question": "Nhà nước pháp quyền là:", "options": {"A": "Một kiểu Nhà nước", "B": "Một chế độ Nhà nước", "C": "Cách tổ chức phân công quyền lực Nhà nước", "D": "Tất cả đều đúng"}, "answer": "C"}, {"id": 166, "question": "Nhà nước thể hiện ý chí, lợi ích và nguyện vọng của nhân dân là nói đến đặc điểm nào dưới đây?", "options": {"A": "Tính xã hội", "B": "Tính nhân dân", "C": "Tính giai cấp", "D": "Tính quần chúng"}, "answer": "B"}, {"id": 167, "question": "Nhà nư ớc pháp quy ền xã hội chủ nghĩa Việt Nam do tố chức nào dư ới đây lãnh đạo?", "options": {"A": "Mặt trận Tổ quốc Việt Nam", "B": "Đảng Cộng sản Việt Nam", "C": "Hội liên hiệp Phụ nữ Việt Nam", "D": "Liên đoàn Lao động Việt Nam"}, "answer": "B"}, {"id": 168, "question": "Nhà nư ớc pháp quy ền có nghĩa là, mọi hoạt động của các cơ quan nhà nư ớc, tổ chức xã hội và mọi công dân đều được thực hiện trên cơ sở:", "options": {"A": "Pháp luật", "B": "Chính sách", "C": "Dư luận xã hội", "D": "Niềm tin"}, "answer": "A"}, {"id": 169, "question": "Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam mang bản chất của giai cấp:", "options": {"A": "Công nhân", "B": "Nông dân", "C": "Tri thức", "D": "Tiểu thương"}, "answer": "A"}, {"id": 170, "question": "Tính dân tộc của Nhà nước ta được thể hiện:", "options": {"A": "Nhà nước ta là Nhà nước của các dân tộc", "B": "Nhà nước chăm lo lợi ích mọi mặt cho các dân tộc ở Việt Nam", "C": "Mỗi dân tộc có bản sắc riêng của mình", "D": "Dân tộc nào cũng có chữ viết riêng"}, "answer": "B"}, {"id": 171, "question": "Tính nhân dân của Nhà nước ta thể hiện:", "options": {"A": "Nhà nước ta là Nhà nước của nhân dân, do nhân dân, vì nhân dân", "B": "Nhà nước ta là Nhà nước của đại gia đình các dân tộc Việt Nam", "C": "Đời sống nhân dân ngày càng tốt hơn", "D": "Nhân dân tích cực lao động vì đất nước"}, "answer": "A"}, {"id": 172, "question": "Công dân nước Cộng hòa xã hội chủ nghĩa Việt Nam là:", "options": {"A": "Người có quốc tịch Việt Nam.", "B": "Người sinh sống trên đất nước Việt Nam.", "C": "Người sinh sống ở nước ngoài nhưng có gốc là người Việt Nam.", "D": "Người sinh ra tại đất nước Việt Nam."}, "answer": "A"}, {"id": 173, "question": "Người công dân tốt là:", "options": {"A": "Người thường xuyên làm từ thiện.", "B": "Người thực hiện tốt quyền và nghĩa vụ cơ bản của công dân.", "C": "Người tuyên truyền tốt chính sách pháp luật.", "D": "Người luôn tích cực đóng góp ý kiến xây dựng đất nước."}, "answer": "B"}, {"id": 174, "question": "Người lao động tốt là:", "options": {"A": "Người công dân tốt.", "B": "Người tuyên truyền tốt chính sách pháp luật.", "C": "Người công dân tốt có khả năng lao động tốt.", "D": "Người cần cù lao động."}, "answer": "C"}, {"id": 175, "question": "Tiêu chí chung nhất của người lao động tốt được thể hiện trong:", "options": {"A": "Sự rèn luyện trưởng thành trong gian khó.", "B": "Sự tu dưỡng đạo đức.", "C": "Sự thể hiện bản lĩnh, năng lực cá nhân.", "D": "Sự rèn luyện, phấn đấu: Đối với chính mình; Đối với mọi người."}, "answer": "D"}, {"id": 176, "question": "Một trong những nội dung tu dư ỡng, rèn luyện để trở thành người công dân tốt, người lao động tốt là:", "options": {"A": "Thể hiện bản lĩnh, năng lực cá nhân.", "B": "Thực hiện tốt chính sách pháp luật.", "C": "Phát huy truyền thống yêu nước, trung thành với sự nghiệp cách mạng của nhân dân Việt Nam.", "D": "Thực hiện tốt nghĩa vụ công dân, sống có lý tư ởng, mục đích, biết yêu thương giúp đỡ đồng bào."}, "answer": "C"}, {"id": 177, "question": "Chọn đáp án đúng nhất cho nội dung tu dưỡng, rèn luyện để trở thành người công dân tốt, người lao động tốt là:", "options": {"A": "Thể hiện bản lĩnh, năng lực cá nhân.", "B": "Phấn đấu học tập nâng cao năng lực và rèn luyện phẩm chất cá nhân.", "C": "Tích cực tham gia phong trào đoàn thể.", "D": "Thực hiện tốt chính sách pháp luật."}, "answer": "B"}, {"id": 178, "question": "Người công dân tốt, người lao động tốt cần tu dưỡng, rèn luyện về tinh thần trách nhiệm đối với?", "options": {"A": "Công việc, gia đình. (1)", "B": "Cơ quan, đơn vị. (2)", "C": "Cộng đồng và toàn xã hội. (3)", "D": "Cả (1), (2), (3) đều đúng."}, "answer": "D"}, {"id": 179, "question": "Tu dưỡng, rèn luyện về tinh thần trách nhiệm: với công việc, với gia đình, với cơ quan, đơn vị, cộng đồng và toàn xã hội là nội dung:", "options": {"A": "Tu dưỡng, rèn luyện về trách nhiệm cá nhân trong các mối quan hệ xã hội.", "B": "Tu dưỡng, rèn luyện về phẩm chất cá nhân trong các mối quan hệ xã hội.", "C": "Tu dưỡng, rèn luyện về năng lực cá nhân trong các mối quan hệ xã hội.", "D": "Tu dưỡng, rèn luyện về thái độ cá nhân trong các mối quan hệ xã hội."}, "answer": "A"}, {"id": 180, "question": "Mục tiêu phát triển kinh tế, theo Hồ Chí Minh là:", "options": {"A": "Tất cả vì công nhân, để mọi người dân có ăn, có mặc, có chỗ ở và được học hành.", "B": "Tất cả vì con người, để mọi người dân có ăn, có mặc, có chỗ ở và được học hành.", "C": "Tất cả vì nông dân, để mọi người dân có ăn, có mặc, có chỗ ở và được học hành.", "D": "Tất cả vì tư sản, để mọi người dân có ăn, có mặc, có chỗ ở và được học hành."}, "answer": "B"}, {"id": 181, "question": "Phong cách lãnh đạo của Hồ Chí Minh thể hiện đầy đủ những nội dung nào:", "options": {"A": "Sự tuân thủ nghiêm nguyên tắc tập trung dân chủ, tập thể lãnh đạo, cá nhân phụ trách; đi đúng đường lối quần chúng; lãnh đạo bằng nêu gương.", "B": "Sự tuân thủ nghiêm nguyên tắc tập thể lãnh đạo, cá nhân phụ trách", "C": "Đi đúng đường lối quần chúng; lãnh đạo bằng nêu gương.", "D": "Sự tuân thủ nghiêm nguyên tắc độc tôn dân chủ, tập thể lãnh đạo, cá nhân phụ trách; đi đúng đường lối quần chúng; lãnh đạo bằng nêu gương."}, "answer": "A"}, {"id": 182, "question": "Trong những điểm sau đây nói về chính sách cai trị của thực dân Pháp, điểm nào thuộc về chính sách cai trị về chính trị ?", "options": {"A": "Chia Việt Nam ra thành ba xứ để cai trị: Bắc Kỳ, Trung Kỳ, Nam Kỳ.", "B": "Chính sách khai thác thuộc địa.", "C": "Thực hiện chính sách dung túng, duy trì các hủ tục lạc hậu trong nhân dân ta.", "D": "Thực hiện khẩu hiệu: tự do, bình đẳng, bác ái ở nước ta."}, "answer": "A"}, {"id": 183, "question": "Lựa chọn đáp án thích hợp để điền vào chỗ trống trong khái niệm dưới đây: “Vật chất là một phạm trù triết học dùng để chỉ thực tại khách quan được đem lại cho con người trong cảm giác, được cảm giác của chúng ta ………và tồn tại không lệ thuộc vào cảm giác”.", "options": {"A": "chép lại, chụp lại, phản ánh", "B": "chép lại, lệ thuộc, phản ánh", "C": "chụp lại, chép lại, phản ánh", "D": "chụp lại, lệ thuộc, phản ánh"}, "answer": "A"}, {"id": 184, "question": "Học thuyết giá trị thặng dư là ..............trong toàn bộ học thuyết kinh tế của C.Mác, là đóng góp to lớn của ông trong lịch sử tư tưởng nhân loại. Nó chỉ ra bản chất bóc lột của phương thức sản xuất tư bản chủ nghĩa.", "options": {"A": "hòn đá tảng", "B": "sợi chỉ đỏ", "C": "bộ phận quan trọng", "D": "vấn đề cơ bản"}, "answer": "A"}, {"id": 185, "question": "Nhà nước đầu tiên trong lịch sử là kiểu nhà nước nào ?", "options": {"A": "Nhà nước phong kiến.", "B": "Nhà nước chủ nô.", "C": "Nhà nước tư sản.", "D": "Nhà nước vô sản."}, "answer": "B"}, {"id": 186, "question": "Xác định đâu là một trong những phương hướng xây dựng chủ nghĩa xã hội ở Việt Nam được nêu ra tại Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung và phát triển năm 2011) ?", "options": {"A": "Có quan hệ hữu nghị và hợp tác với các nước trên thế giới.", "B": "Dân giàu, nước mạnh, xã hội công bằng, dân chủ, văn minh.", "C": "Đẩy mạnh công nghiệp hóa, hiện đại hóa đất nước gắn với phát triển kinh tế tri thức, bảo vệ tài nguyên, môi trường.", "D": "Có nền văn hóa tiên tiến, khoa học, đậm đà bản sắc dân tộc."}, "answer": "C"}, {"id": 187, "question": "Phát triển nền kinh tế thị trường định hướng xã hội chủ nghĩa là một trong những ?", "options": {"A": "Đặc trưng cơ bản của chủ nghĩa xã hội ở Việt Nam được nêu ra tại Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung và phát triển năm 2011).", "B": "Phương thức lãnh đạo củ Đảng trong thời kỳ đổi mới.", "C": "Mục tiêu phát triển kinh tế trong thời kỳ công nghệ 4.0.", "D": "Phương hướng xây dựng chủ nghĩa xã hội ở Việt Nam được nêu ra tại Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung và phát triển năm 2011)."}, "answer": "D"}, {"id": 188, "question": "Đặc trưng của chủ nghĩa xã hội ở Việt Nam thuộc về lĩnh vực văn hóa được nêu ra tại Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung và phát triển năm 2011)?", "options": {"A": "Có quan hệ hữu nghị và hợp tác với các nước trên thế giới.", "B": "Tiên tiến, đậm đà bản sắc dân tộc.", "C": "Giải phóng khỏi áp bức bất công, nâng cao đời sống nhân dân, thực hiện tiến bộ và công bằng xã hội.", "D": "Bình đẳng, đoàn kết, tương trợ giúp đỡ lẫn nhau."}, "answer": "B"}, {"id": 189, "question": "Đảm bảo vững chắc quốc phòng, an ninh quốc gia, trật tự, an toàn xã hội được xem là ?", "options": {"A": "Nhiệm vụ trọng yếu, thường xuyên của Đảng, Nhà nước và toàn dân. (1)", "B": "Đặc trưng cơ bản của chủ nghĩa xã hội ở Việt Nam được nêu ra tại Cương lĩnh xây dựng đất nước trong thời kỳ quá độ lên chủ nghĩa xã hội (bổ sung và phát triển năm 2011).(2)", "C": "Phương thức lãnh đạo củ Đảng trong thời kỳ đổi mới. (3)", "D": "Cả (1), (2), (3) đều đúng."}, "answer": "A"}, {"id": 190, "question": "Lực lượng nòng cốt Đảm bảo vững chắc quốc phòng, an ninh quốc gia, trật tự, an toàn xã hội là?", "options": {"A": "Cán bộ, đảng viên.", "B": "Quân đội nhân dân và Công an nhân dân, dân quân tự vệ.", "C": "Quân đội nhân dân và Công an nhân dân.", "D": "Quân đội nhân dân và Công an nhân dân, dân quân tự vệ, các đoàn thể chính trị xã hội."}, "answer": "C"}, {"id": 191, "question": "Công nghiệp hoá, hiện đại hoá đất nước phải bảo đảm ?", "options": {"A": "Xây dựng nền kinh tế khép kín và hướng nội.", "B": "Xây dựng nền kinh tế độc lập tự chủ.", "C": "Xây dựng nền kinh tế dựa vào sự giúp đỡ của nước tư bản.", "D": "Xây dựng nền kinh tế mở và giao lưu hợp tác với các nước xã hội chủ nghĩa."}, "answer": "B"}, {"id": 192, "question": "Trong quá trình công nghiệp hoá hiện đại hoá nền kinh tế nào được coi là yếu tố quan trọng ?", "options": {"A": "Kinh tế nông nghiệp.", "B": "Nền kinh tế công nghiệp.", "C": "Nền kinh tế tri thức.", "D": "Nền kinh tế công - nông nghiệp kết hợp."}, "answer": "C"}, {"id": 193, "question": "Theo Hồ Chí Minh, nền tảng của Mặt trận dân tộc thống nhất:", "options": {"A": "Liên minh kết công – nông.", "B": "Liên minh công – nông – lao động trí óc.", "C": "Liên minh dân tộc.", "D": "Liên minh công – nông và các tầng lớp xã hội khác."}, "answer": "B"}, {"id": 194, "question": "Từ xa xưa trong lịch sử, dân tộc Việt Nam sớm có ý thức cộng đồng, ý thức đoàn kết “bầu ơi thương lấy bí cùng…”, “lá lành đùm lá rách”…. đã tr ở thành cơ sở nào của đường lối, chính sách đại đoàn kết toàn dân tộc trong xây dựng và bảo vệ Tổ quốc ?", "options": {"A": "Cơ sở chủ quan", "B": "Cơ sở khoa học", "C": "Cơ sở lý luận", "D": "Cơ sở thực tiễn"}, "answer": "D"}, {"id": 195, "question": "Thời gian lao động xã hội cần thiết là …………để sản xuất ra một hàng hoá trong điều kiện bình thường của xã hội, tức là với một trình độ ………….. và cường độ lao động trung bình so với điều kiện xã hội nhất định. Lựa chọn đáp án đúng để điền vào chỗ trống:", "options": {"A": "thời gian cần thiết/ kỹ thuật trung bình", "B": "thời gian chủ yếu/ kỹ thuật trung bình", "C": "thời gian cần thiết/ kỹ thuật cá biệt", "D": "thời gian đủ/ kỹ thuật trung bình"}, "answer": "A"}, {"id": 196, "question": "Để sản xuất ra một cái áo, thời gian lao động của anh Thiên là 1 giờ, anh Phát là 2 giờ, anh Đạt là 3 giờ. Trong khi đó, thời gian lao động xã hội cần thiết là 2 giờ. Trong 3 người trên, ai thực hiện tốt quy luật giá trị ?", "options": {"A": "Anh Thiên. (1)", "B": "Anh Phát. (2)", "C": "Anh Đạt. (3)", "D": "Cả (1) và (2) đều đúng."}, "answer": "D"}, {"id": 197, "question": "Hoàn thiện nội dung sau: Đại hội XII của Đảng tiếp tục khẳng định phương châm và định hướng lớn của hoạt động đối ngoại là: “…, … trong quan hệ đối ngoại; chủ động và tích cực hội nhập quốc tế; là bạn, là đối tác tin cậy và … có trách nhiệm của cộng đồng quốc tế”.", "options": {"A": "Đa dạng hóa, đa phương hóa / thành viên.", "B": "Đa dạng hóa, đa phương hóa / hội viên.", "C": "Đa phương hóa, đa dạng hóa / thành viên.", "D": "Đa phương hóa, đa dạng hóa / hội viên."}, "answer": "A"}, {"id": 198, "question": "Thường ngày Nam và Sơn cùng ng ồi học chung một bàn. Một hôm, Nam bị mất điện thoại, Nam cho rằng Sơn đã lấy điện thoại Nam, sau đó hai bạn lời qua ti ếng lại với nhau. Tức quá Nam đánh Sơn. Hỏi Nam đã vi phạm luật gì ?", "options": {"A": "Quyền sống, bất khả xâm phạm về thân thể, được pháp luật bảo hộ về sức khoẻ, danh dự và nhân phẩm.", "B": "Quyền bất khả xâm phạm về đời sống riêng tư.", "C": "Bí mật cá nhân và bí mật gia đình.", "D": "Bí mật thư tín, điện thoại, điện tín và các hình thức trao đổi thông tin riêng tư khác."}, "answer": "A"}, {"id": 199, "question": "Thấy con gái đi học thường xuyên nhắn tin nói chuyện với một bạn trai trong lớp. Lo sợ con gái bị bạn xấu lợi dụng nên bà Lan thường xuyên xem điện thoại của con mà không được sự đồng ý. Cá biệt có những tin nhắn bà đọc xong xóa luôn không cho con gái biết. Một hôm tình cờ phát hiện sự việc này con gái bà rất tức giận và nói: Mẹ không được phép làm như vậy. Mẹ làm như vậy là vi phạm pháp luật đấy. Theo em con gái bà Lan đang đề cập đến quyền gì của công dân ?", "options": {"A": "Quyền sống, bất khả xâm phạm về thân thể, được pháp luật bảo hộ về sức khoẻ, danh dự và nhân phẩm.", "B": "Quyền bất khả xâm phạm về đời sống riêng tư.", "C": "Bí mật cá nhân và bí mật gia đình.", "D": "Bí mật thư tín, điện thoại, điện tín và các hình thức trao đổi thông tin riêng tư khác."}, "answer": "D"}, {"id": 200, "question": "Đang là sinh viên năm th ứ 2 tại một trường cao đẳng trên thành ph ố, một hôm Lam nhận được điện thoại của gia đình yêu cầu về quê có chuyện gấp. Về tới quê Lam bị ép gả cho một người mà Lam không yêu ch ỉ vì người đó giúp gia đình Lam có một số tiền lớn để trả nợ. Lam không đồng ý và đã trốn lên thành phố. Trong tình huống này gia đình Lam đã vi phạm quyền gì ?", "options": {"A": "Quyền sống, bất khả xâm phạm về thân thể, được pháp luật bảo hộ về sức khoẻ, danh dự và nhân phẩm.", "B": "Quyền bất khả xâm phạm về đời sống riêng tư.", "C": "Quyền tự do ngôn luận.", "D": "Quyền kết hôn, ly hôn theo nguyên tắc tự nguyện, tiến bộ, một vợ một chồng, vợ chồng bình đẳng, tôn trọng lẫn nhau./."}, "answer": "D"}];
+    
+    // Application States
+    let appState = {
+      mode: 'practice', // 'practice' | 'exam'
+      filter: 'all', // 'all' | 'done' | 'undone' | 'correct' | 'incorrect'
+      searchQuery: '',
+      shuffledQuestions: [], // Stores question objects with currently shuffled options
+      userSelections: {}, // qId -> selected option index (0..3)
+      examSubmitted: false
+    };
+
+    // Lazy loading variables
+    let visibleCount = 15;
+    let currentFilteredQuestions = [];
+
+    // Initialize application
+    function init() {
+      // 1. Try loading progress from LocalStorage
+      const saved = localStorage.getItem('tracnghiem_gdct_state_v3') || localStorage.getItem('tracnghiem_gdct_state_v2');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState.mode = parsed.mode || 'practice';
+          appState.userSelections = parsed.userSelections || {};
+          appState.examSubmitted = parsed.examSubmitted || false;
+          appState.shuffledQuestions = parsed.shuffledQuestions || [];
+        } catch (e) {
+          console.error("Failed to restore saved progress", e);
+        }
+      }
+
+      // Update mode buttons UI
+      updateModeButtonsUI();
+
+      // 2. Generate shuffles if empty or sync text with ORIGINAL_QUESTIONS
+      if (!appState.shuffledQuestions || appState.shuffledQuestions.length !== ORIGINAL_QUESTIONS.length) {
+        shuffleAllOptions();
+      } else {
+        // Always sync text from ORIGINAL_QUESTIONS to replace any stale/truncated text cached in LocalStorage
+        appState.shuffledQuestions.forEach(sq => {
+          const orig = ORIGINAL_QUESTIONS.find(o => o.id === sq.id);
+          if (orig) {
+            sq.question = orig.question;
+            sq.correctAnswerText = orig.options[orig.answer];
+            if (sq.shuffledOptions) {
+              sq.shuffledOptions.forEach(opt => {
+                if (opt.originalKey && orig.options[opt.originalKey] !== undefined) {
+                  opt.text = orig.options[opt.originalKey];
+                }
+              });
+            }
+          }
+        });
+      }
+
+      // Save updated synced state
+      saveProgress();
+
+      // 3. Render questions list & grid & stats
+      visibleCount = 15;
+      updateFilteredDataset();
+      renderQuestionsList(false);
+      renderNavigationGrid();
+      updateStats();
+    }
+
+    function updateModeButtonsUI() {
+      document.getElementById('mode-practice').classList.toggle('active', appState.mode === 'practice');
+      document.getElementById('mode-exam').classList.toggle('active', appState.mode === 'exam');
+      document.getElementById('submit-btn').style.display = (appState.mode === 'exam' && !appState.examSubmitted) ? 'block' : 'none';
+    }
+
+    // Shuffle options for all questions
+    function shuffleAllOptions() {
+      appState.shuffledQuestions = ORIGINAL_QUESTIONS.map(q => {
+        const optionKeys = ['A', 'B', 'C', 'D'];
+        
+        // Find correct option text
+        const correctText = q.options[q.answer];
+
+        // Map options to array of object
+        const optArray = optionKeys.map(key => ({
+          text: q.options[key],
+          originalKey: key
+        })).filter(o => o.text !== undefined);
+
+        // Shuffle the array (Fisher-Yates)
+        for (let i = optArray.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [optArray[i], optArray[j]] = [optArray[j], optArray[i]];
+        }
+
+        return {
+          id: q.id,
+          question: q.question,
+          shuffledOptions: optArray,
+          correctAnswerText: correctText
+        };
+      });
+    }
+
+    // Set quiz mode
+    function setMode(newMode) {
+      if (appState.mode === newMode) return;
+      
+      if (newMode === 'exam' && Object.keys(appState.userSelections).length > 0 && !appState.examSubmitted) {
+        if (!confirm('Chuyển sang chế độ Thi thử sẽ ẩn các phản hồi đúng sai ngay lập tức của bạn cho tới khi nộp bài. Bạn có muốn tiếp tục?')) {
+          return;
+        }
+      }
+      
+      appState.mode = newMode;
+      updateModeButtonsUI();
+      
+      // Re-render only currently visible cards
+      renderQuestionsList(false);
+      renderNavigationGrid();
+      updateStats();
+      saveProgress();
+    }
+
+    // Set search query
+    function handleSearch() {
+      appState.searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+      visibleCount = 15;
+      updateFilteredDataset();
+      renderQuestionsList(false);
+    }
+
+    // Set filter
+    function setFilter(filterType) {
+      appState.filter = filterType;
+      
+      // Update active filter button class
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById(`filter-${filterType}`).classList.add('active');
+
+      visibleCount = 15;
+      updateFilteredDataset();
+      renderQuestionsList(false);
+    }
+
+    // Shuffle and save
+    function shuffleAnswersAll() {
+      if (confirm('Tráo đáp án sẽ xáo trộn lại thứ tự lựa chọn A, B, C, D của toàn bộ 200 câu hỏi. Tiến độ làm bài của bạn vẫn giữ nguyên nhưng vị trí các đáp án sẽ thay đổi. Tiếp tục?')) {
+        shuffleAllOptions();
+        
+        visibleCount = 15;
+        updateFilteredDataset();
+        renderQuestionsList(false);
+        
+        updateStats();
+        saveProgress();
+        showToast('Tráo đáp án thành công!');
+      }
+    }
+
+    // Reset progress
+    function resetProgressConfirm() {
+      if (confirm('Bạn có chắc muốn đặt lại toàn bộ tiến độ làm bài không? Tất cả đáp án bạn đã chọn sẽ bị xóa sạch.')) {
+        appState.userSelections = {};
+        appState.examSubmitted = false;
+        shuffleAllOptions();
+        
+        document.getElementById('search-input').value = '';
+        appState.searchQuery = '';
+        
+        setFilter('all');
+        updateModeButtonsUI();
+        
+        visibleCount = 15;
+        updateFilteredDataset();
+        renderQuestionsList(false);
+        renderNavigationGrid();
+        updateStats();
+        saveProgress();
+        showToast('Đã làm lại từ đầu!');
+      }
+    }
+
+    // Save state to localStorage
+    function saveProgress() {
+      const stateToSave = {
+        mode: appState.mode,
+        userSelections: appState.userSelections,
+        examSubmitted: appState.examSubmitted,
+        shuffledQuestions: appState.shuffledQuestions
+      };
+      localStorage.setItem('tracnghiem_gdct_state_v3', JSON.stringify(stateToSave));
+    }
+
+    // Get grading status of a single question
+    function getQuestionStatus(qId) {
+      const q = appState.shuffledQuestions.find(x => x.id === qId);
+      if (!q) return 'unanswered';
+      
+      const selectionIdx = appState.userSelections[qId];
+      if (selectionIdx === undefined) return 'unanswered';
+
+      const selectedOptText = q.shuffledOptions[selectionIdx].text;
+      const isCorrect = selectedOptText === q.correctAnswerText;
+
+      return isCorrect ? 'correct' : 'incorrect';
+    }
+
+    // Answer selecting handler
+    function selectOption(qId, optionIdx) {
+      if (appState.mode === 'exam' && appState.examSubmitted) {
+        return; // Locked after submission
+      }
+
+      appState.userSelections[qId] = optionIdx;
+      
+      // Update UI for this question card
+      renderQuestionCard(qId);
+      
+      // Update navigation grid item
+      updateGridItem(qId);
+
+      // Update stats and save
+      updateStats();
+      saveProgress();
+    }
+
+    // Updates the currentFilteredQuestions array according to search and filters
+    function updateFilteredDataset() {
+      const query = appState.searchQuery;
+      const filter = appState.filter;
+
+      currentFilteredQuestions = appState.shuffledQuestions.filter(q => {
+        let matchFilter = true;
+        const status = getQuestionStatus(q.id);
+
+        if (filter === 'done' && status === 'unanswered') matchFilter = false;
+        else if (filter === 'undone' && status !== 'unanswered') matchFilter = false;
+        else if (filter === 'correct' && status !== 'correct') matchFilter = false;
+        else if (filter === 'incorrect' && status !== 'incorrect') matchFilter = false;
+
+        let matchSearch = true;
+        if (query) {
+          const matchId = q.id.toString() === query;
+          const matchText = q.question.toLowerCase().includes(query);
+          
+          let matchOptions = false;
+          for (let opt of q.shuffledOptions) {
+            if (opt.text.toLowerCase().includes(query)) {
+              matchOptions = true;
+              break;
+            }
+          }
+          matchSearch = matchId || matchText || matchOptions;
+        }
+
+        return matchFilter && matchSearch;
+      });
+    }
+
+    // Renders matching questions in chunks (Lazy loading)
+    function renderQuestionsList(append = false) {
+      const container = document.getElementById('questions-container');
+      if (!append) {
+        container.innerHTML = '';
+      }
+
+      const toRender = currentFilteredQuestions.slice(
+        append ? container.children.length : 0,
+        visibleCount
+      );
+
+      toRender.forEach(q => {
+        // Skip rendering if already in DOM (prevents duplicates)
+        if (document.getElementById(`q-card-${q.id}`)) return;
+
+        const card = document.createElement('div');
+        card.className = 'panel card';
+        card.id = `q-card-${q.id}`;
+        container.appendChild(card);
+        buildCardContent(card, q);
+      });
+
+      // Handle no results empty state
+      let noResults = document.getElementById('no-results-message');
+      if (currentFilteredQuestions.length === 0) {
+        if (!noResults) {
+          noResults = document.createElement('div');
+          noResults.id = 'no-results-message';
+          noResults.className = 'no-results panel';
+          noResults.innerHTML = `
+            <i class="fa-regular fa-folder-open"></i>
+            <p>Không tìm thấy câu hỏi nào phù hợp với bộ lọc hoặc từ khóa tìm kiếm.</p>
+          `;
+          container.appendChild(noResults);
+        } else {
+          noResults.style.display = 'block';
+        }
+      } else {
+        if (noResults) noResults.style.display = 'none';
+      }
+    }
+
+    // Appends more questions when scrolled
+    function loadMoreQuestions() {
+      if (visibleCount < currentFilteredQuestions.length) {
+        visibleCount = Math.min(visibleCount + 15, currentFilteredQuestions.length);
+        renderQuestionsList(true);
+      }
+    }
+
+    // Window scroll listener for infinite scrolling
+    window.addEventListener('scroll', () => {
+      if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 600) {
+        loadMoreQuestions();
+      }
+    });
+
+    // Renders/updates a specific question card
+    function renderQuestionCard(qId) {
+      const card = document.getElementById(`q-card-${qId}`);
+      if (!card) return;
+      const q = appState.shuffledQuestions.find(x => x.id === qId);
+      if (!q) return;
+      buildCardContent(card, q);
+    }
+
+    // Helper to generate question card HTML content
+    function buildCardContent(card, q) {
+      const status = getQuestionStatus(q.id);
+      const isAnswered = appState.userSelections[q.id] !== undefined;
+      const showAnswers = (appState.mode === 'practice' && isAnswered) || (appState.mode === 'exam' && appState.examSubmitted);
+
+      // Status badge template
+      let statusBadge = '';
+      if (showAnswers) {
+        if (status === 'correct') {
+          statusBadge = '<span class="q-status-badge correct"><i class="fa-solid fa-check"></i> Đúng</span>';
+        } else {
+          statusBadge = '<span class="q-status-badge incorrect"><i class="fa-solid fa-xmark"></i> Sai</span>';
+        }
+      } else if (isAnswered) {
+        statusBadge = '<span class="q-status-badge unanswered" style="color:#c084fc; border-color: rgba(124, 58, 237, 0.3); background: rgba(124, 58, 237, 0.05);"><i class="fa-solid fa-pen"></i> Đã chọn</span>';
+      } else {
+        statusBadge = '<span class="q-status-badge unanswered">Chưa trả lời</span>';
+      }
+
+      let optionsHtml = '';
+      const letters = ['A', 'B', 'C', 'D'];
+      const selectedIdx = appState.userSelections[q.id];
+
+      q.shuffledOptions.forEach((opt, idx) => {
+        const isSelected = selectedIdx === idx;
+        const isCorrectChoice = opt.text === q.correctAnswerText;
+        
+        let choiceClass = '';
+        if (isSelected) choiceClass += ' selected';
+        
+        // Show correct / incorrect colors if needed
+        if (showAnswers) {
+          if (isCorrectChoice) {
+            choiceClass += ' correct-choice';
+          } else if (isSelected && !isCorrectChoice) {
+            choiceClass += ' incorrect-choice';
+          }
+          choiceClass += ' disabled';
+        }
+
+        optionsHtml += `
+          <div class="option${choiceClass}" onclick="selectOption(${q.id}, ${idx})">
+            <div class="option-letter">${letters[idx]}</div>
+            <div class="option-text">${escapeHtml(opt.text)}</div>
+          </div>
+        `;
+      });
+
+      card.innerHTML = `
+        <div class="q-number">
+          <span>Câu ${q.id}</span>
+          ${statusBadge}
+        </div>
+        <div class="q-text">${escapeHtml(q.question)}</div>
+        <div class="options-grid">
+          ${optionsHtml}
+        </div>
+      `;
+    }
+
+    // Render 1-200 navigation grid
+    function renderNavigationGrid() {
+      const grid = document.getElementById('navigation-grid');
+      grid.innerHTML = '';
+
+      appState.shuffledQuestions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.id = `grid-btn-${q.id}`;
+        btn.className = 'grid-btn';
+        btn.textContent = q.id;
+        
+        updateGridItemClass(btn, q.id);
+
+        btn.onclick = () => {
+          document.querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // If the item is currently filtered out, switch filter to all
+          const isFilteredOut = !currentFilteredQuestions.some(x => x.id === q.id);
+          if (isFilteredOut) {
+            setFilter('all');
+          }
+
+          // Locate question index in currentFilteredQuestions
+          const qIdx = currentFilteredQuestions.findIndex(x => x.id === q.id);
+          if (qIdx !== -1) {
+            // Expand visibleCount dynamically to include the target item if it's further down
+            if (qIdx >= visibleCount) {
+              visibleCount = qIdx + 1;
+              renderQuestionsList(true);
+            }
+
+            // Scroll to the card
+            const card = document.getElementById(`q-card-${q.id}`);
+            if (card) {
+              card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              card.style.borderColor = 'var(--primary)';
+              setTimeout(() => {
+                card.style.borderColor = 'var(--card-border)';
+              }, 1000);
+            }
+          }
+
+          if (window.innerWidth <= 1024) {
+            toggleMobilePanel();
+          }
+        };
+
+        grid.appendChild(btn);
+      });
+    }
+
+    // Update single grid item styling
+    function updateGridItem(qId) {
+      const btn = document.getElementById(`grid-btn-${qId}`);
+      if (btn) {
+        updateGridItemClass(btn, qId);
+      }
+    }
+
+    function updateGridItemClass(btn, qId) {
+      const status = getQuestionStatus(qId);
+      const isAnswered = appState.userSelections[qId] !== undefined;
+      const isExam = appState.mode === 'exam';
+
+      btn.classList.remove('correct', 'incorrect', 'answered');
+
+      if (isExam && !appState.examSubmitted) {
+        if (isAnswered) btn.classList.add('answered');
+      } else {
+        if (status === 'correct') btn.classList.add('correct');
+        else if (status === 'incorrect') btn.classList.add('incorrect');
+      }
+    }
+
+    // Update Statistics panels
+    function updateStats() {
+      const total = appState.shuffledQuestions.length;
+      let answeredCount = 0;
+      let correctCount = 0;
+      let incorrectCount = 0;
+
+      appState.shuffledQuestions.forEach(q => {
+        const isAnswered = appState.userSelections[q.id] !== undefined;
+        if (isAnswered) {
+          answeredCount++;
+          const status = getQuestionStatus(q.id);
+          if (status === 'correct') correctCount++;
+          else if (status === 'incorrect') incorrectCount++;
+        }
+      });
+
+      const unansweredCount = total - answeredCount;
+      const percentDone = total > 0 ? Math.round((answeredCount / total) * 100) : 0;
+      const scorePercent = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+      document.getElementById('stat-done').textContent = `${answeredCount}/${total}`;
+      document.getElementById('stat-score').textContent = `${scorePercent}%`;
+      document.getElementById('stat-correct').textContent = correctCount;
+      document.getElementById('stat-incorrect').textContent = incorrectCount;
+      
+      document.getElementById('percent-label').textContent = `${percentDone}%`;
+      document.getElementById('progress-bar').style.width = `${percentDone}%`;
+
+      document.getElementById('count-done').textContent = answeredCount;
+      document.getElementById('count-undone').textContent = unansweredCount;
+      document.getElementById('count-correct').textContent = correctCount;
+      document.getElementById('count-incorrect').textContent = incorrectCount;
+    }
+
+    // Submit Exam Mode
+    function submitExam() {
+      const answered = Object.keys(appState.userSelections).length;
+      const total = appState.shuffledQuestions.length;
+      
+      if (answered < total) {
+        if (!confirm(`Bạn mới làm ${answered}/${total} câu. Bạn có chắc muốn nộp bài chấm điểm ngay bây giờ không?`)) {
+          return;
+        }
+      } else {
+        if (!confirm('Bạn có chắc muốn nộp bài chấm điểm không?')) {
+          return;
+        }
+      }
+
+      appState.examSubmitted = true;
+      document.getElementById('submit-btn').style.display = 'none';
+
+      // Re-render currently visible cards to show correctness
+      renderQuestionsList(false);
+      renderNavigationGrid();
+      updateStats();
+      saveProgress();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      let correct = 0;
+      appState.shuffledQuestions.forEach(q => {
+        if (getQuestionStatus(q.id) === 'correct') correct++;
+      });
+      alert(`KẾT QUẢ THI THỬ:\nSố câu đúng: ${correct}/${total}\nĐiểm số: ${(correct/total * 10).toFixed(2)}/10 điểm.\nBạn có thể dò lại các câu sai màu đỏ để ôn tập.`);
+    }
+
+    // Mobile Panel trigger
+    function toggleMobilePanel() {
+      const panel = document.getElementById('right-panel');
+      panel.classList.toggle('show');
+    }
+
+    // Helpers
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Run on startup
+    window.onload = init;
+  </script>
+</body>
+</html>
