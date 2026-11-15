@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 9999px; }
   </style>
@@ -30,26 +30,30 @@
 
   <!-- Top Navbar -->
   <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2.5">
-      <div class="flex items-center gap-2.5">
-        <!-- Button to toggle Left Question Drawer -->
-        <button onclick="toggleLeftPanel()" class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition cursor-pointer" title="Mở / Đóng danh sách 296 câu hỏi">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10"/></svg>
-        </button>
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-extrabold text-base shadow-sm">
+          ITC
+        </div>
         <div>
-          <h1 class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Ôn Tập Giáo Dục Chính Trị</h1>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400">296 câu • Chọn xong tự khóa đáp án</p>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white leading-tight">Ôn Tập Giáo Dục Chính Trị</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+              296 Câu • 9 Bài
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Hiển thị từng câu • Chọn xong tự động khóa đáp án</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <button onclick="shuffleBothNow()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-teal-600 hover:bg-teal-700 active:scale-[0.98] text-white shadow-xs transition cursor-pointer">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="shuffleBothNow()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-teal-600 hover:bg-teal-700 active:scale-[0.98] text-white shadow-xs transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
           <span>Random Câu & Đáp Án</span>
         </button>
 
-        <button onclick="resetAllConfirm()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 transition cursor-pointer">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <button onclick="resetAllConfirm()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           <span>Làm Lại Từ Đầu</span>
         </button>
 
@@ -61,94 +65,110 @@
     </div>
   </header>
 
-  <!-- Backdrop for Left Collapsible Drawer on Mobile -->
-  <div id="drawer-backdrop" onclick="closeLeftPanel()" class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px] hidden transition-opacity"></div>
+  <!-- MOBILE ONLY: Backdrop & Collapsible Left Panel for Question List (Hidden on Laptop lg:hidden) -->
+  <div id="drawer-backdrop" onclick="closeLeftPanel()" class="lg:hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-[1px] hidden transition-opacity"></div>
 
-  <!-- Collapsible Vertical Left Panel (Question List Drawer) -->
-  <aside id="left-drawer" class="fixed top-0 left-0 z-50 h-full w-72 sm:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col transition-transform duration-300 -translate-x-full">
-    
-    <!-- Handle tab sticking out on the right edge of the left drawer so user can pull it out/in anytime -->
-    <button onclick="toggleLeftPanel()" class="absolute top-1/2 -right-8 -translate-y-1/2 w-8 h-20 rounded-r-xl bg-teal-600 hover:bg-teal-700 text-white shadow-md flex flex-col items-center justify-center gap-1 cursor-pointer" title="Thu vào / Mở ra danh sách câu hỏi">
+  <aside id="left-drawer" class="lg:hidden fixed top-0 left-0 z-50 h-full w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col transition-transform duration-300 -translate-x-full">
+    <!-- Green Tab Handle on Left Edge -->
+    <button onclick="toggleLeftPanel()" class="absolute top-1/2 -right-8 -translate-y-1/2 w-8 h-20 rounded-r-xl bg-teal-600 hover:bg-teal-700 text-white shadow-md flex flex-col items-center justify-center gap-1 cursor-pointer" title="Mở / Thu gọn danh sách câu hỏi">
       <svg id="drawer-arrow" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
       <span class="text-[9px] font-bold uppercase tracking-tighter [writing-mode:vertical-rl]">DS Câu</span>
     </button>
 
-    <!-- Drawer Header -->
     <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
       <div>
-        <h2 class="text-sm font-bold text-slate-900 dark:text-white">Danh Mục Câu Hỏi (<span id="grid-count">296</span>)</h2>
+        <h2 class="text-sm font-bold text-slate-900 dark:text-white">Danh Sách Câu (296)</h2>
         <div class="flex items-center gap-3 mt-1 text-[11px] text-slate-500 dark:text-slate-400">
           <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></i>Đúng</span>
           <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i>Sai</span>
-          <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700 inline-block"></i>Chưa làm</span>
         </div>
       </div>
-      <button onclick="closeLeftPanel()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition cursor-pointer" title="Thu gọn">
+      <button onclick="closeLeftPanel()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-800 transition cursor-pointer">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
       </button>
     </div>
 
-    <!-- Scrollable Vertical Grid of Questions -->
-    <div class="flex-1 overflow-y-auto p-3.5">
-      <div id="question-grid" class="grid grid-cols-5 gap-2">
+    <div class="flex-1 overflow-y-auto p-3">
+      <div id="question-grid-mobile" class="grid grid-cols-5 gap-2">
         <!-- Rendered by JS -->
       </div>
     </div>
   </aside>
 
-  <!-- Main Content Area: Results First, then Active Question Card -->
-  <main class="max-w-3xl w-full mx-auto px-4 py-5 space-y-4 flex-1">
+  <!-- Main Workspace:
+       - Mobile (< lg): Kết quả hiện tại (order-1) ở trên -> Câu hỏi (order-2) ở dưới
+       - Laptop (lg+): Câu hỏi bên trái 8 cột (lg:order-1) -> Kết quả hiện tại + Danh sách câu bên phải 4 cột (lg:order-2) như bình thường
+  -->
+  <main class="max-w-6xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start flex-1">
 
-    <!-- 1. Mục Kết Quả Hiện Tại (Luôn nằm trên câu hỏi cả ở Mobile & Desktop) -->
-    <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Kết quả hiện tại</span>
-        <span id="side-percent" class="text-xs font-bold text-teal-600 dark:text-teal-400">0% hoàn thành</span>
-      </div>
-      <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3.5">
-        <div id="progress-bar" class="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300" style="width: 0%"></div>
-      </div>
-
-      <div class="grid grid-cols-4 gap-2 text-center">
-        <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-2 border border-slate-200/60 dark:border-slate-700/50">
-          <div id="stat-total-done" class="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">0/296</div>
-          <div class="text-[11px] text-slate-500 dark:text-slate-400">Đã khóa</div>
-        </div>
-        <div class="bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl p-2 border border-emerald-200/60 dark:border-emerald-800/50">
-          <div id="stat-correct" class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
-          <div class="text-[11px] text-emerald-700/70 dark:text-emerald-400/80">Đúng</div>
-        </div>
-        <div class="bg-rose-50/70 dark:bg-rose-950/30 rounded-xl p-2 border border-rose-200/60 dark:border-rose-800/50">
-          <div id="stat-wrong" class="text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400">0</div>
-          <div class="text-[11px] text-rose-700/70 dark:text-rose-400/80">Sai</div>
-        </div>
-        <div class="bg-amber-50/70 dark:bg-amber-950/30 rounded-xl p-2 border border-amber-200/60 dark:border-amber-800/50">
-          <div id="stat-score" class="text-sm sm:text-base font-extrabold text-amber-600 dark:text-amber-400">0.0</div>
-          <div class="text-[11px] text-amber-700/70 dark:text-amber-400/80">Điểm 10</div>
-        </div>
-      </div>
-
-      <div class="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Chế độ làm bài</span>
-        <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl sm:w-80">
-          <button id="btn-mode-practice" onclick="setMode('practice')" class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition cursor-pointer">
-            ⚡ Luyện tập (Báo Đ/S)
-          </button>
-          <button id="btn-mode-exam" onclick="setMode('exam')" class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition cursor-pointer">
-            📝 Thi thử (Nộp bài)
-          </button>
-        </div>
-      </div>
-
-      <button id="submit-exam-btn" onclick="submitExam()" class="hidden mt-3 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition cursor-pointer">
-        Nộp Bài & Chấm Điểm Ngay
-      </button>
-    </section>
-
-    <!-- 2. Khung Hiển Thị Từng Câu Hỏi -->
-    <section id="single-question-box">
+    <!-- Question Column: order-2 on mobile, order-1 (left 8 cols) on laptop -->
+    <section id="single-question-box" class="order-2 lg:order-1 lg:col-span-8">
       <!-- Rendered by JS -->
     </section>
+
+    <!-- Stats & Desktop Question Grid Column: order-1 on mobile (above question), order-2 (right 4 cols) on laptop -->
+    <aside class="order-1 lg:order-2 lg:col-span-4 lg:sticky lg:top-20 space-y-4">
+
+      <!-- Kết Quả Hiện Tại -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Kết quả hiện tại</span>
+          <span id="side-percent" class="text-xs font-bold text-teal-600 dark:text-teal-400">0% hoàn thành</span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
+          <div id="progress-bar" class="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <div class="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-2.5 border border-slate-200/60 dark:border-slate-700/50">
+            <div id="stat-total-done" class="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white">0/296</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">Đã khóa</div>
+          </div>
+          <div class="bg-emerald-50/70 dark:bg-emerald-950/30 rounded-xl p-2.5 border border-emerald-200/60 dark:border-emerald-800/50">
+            <div id="stat-correct" class="text-sm sm:text-base font-extrabold text-emerald-600 dark:text-emerald-400">0</div>
+            <div class="text-[11px] text-emerald-700/70 dark:text-emerald-400/80">Đúng</div>
+          </div>
+          <div class="bg-rose-50/70 dark:bg-rose-950/30 rounded-xl p-2.5 border border-rose-200/60 dark:border-rose-800/50">
+            <div id="stat-wrong" class="text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400">0</div>
+            <div class="text-[11px] text-rose-700/70 dark:text-rose-400/80">Sai</div>
+          </div>
+          <div class="bg-amber-50/70 dark:bg-amber-950/30 rounded-xl p-2.5 border border-amber-200/60 dark:border-amber-800/50">
+            <div id="stat-score" class="text-sm sm:text-base font-extrabold text-amber-600 dark:text-amber-400">0.0</div>
+            <div class="text-[11px] text-amber-700/70 dark:text-amber-400/80">Điểm 10</div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Chế độ làm bài</label>
+          <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
+            <button id="btn-mode-practice" onclick="setMode('practice')" class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition cursor-pointer">
+              ⚡ Luyện tập (Báo Đ/S)
+            </button>
+            <button id="btn-mode-exam" onclick="setMode('exam')" class="py-1.5 px-2.5 rounded-lg text-xs font-semibold transition cursor-pointer">
+              📝 Thi thử (Nộp bài)
+            </button>
+          </div>
+          <button id="submit-exam-btn" onclick="submitExam()" class="hidden mt-3 w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition cursor-pointer">
+            Nộp Bài & Chấm Điểm
+          </button>
+        </div>
+      </div>
+
+      <!-- LAPTOP ONLY: Danh sách câu hiển thị bình thường ở cột phải (Hidden on mobile, shown on lg+) -->
+      <div class="hidden lg:block bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Danh sách câu (296)</span>
+          <div class="flex items-center gap-2 text-[11px] text-slate-500">
+            <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></i>Đúng</span>
+            <span class="inline-flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i>Sai</span>
+          </div>
+        </div>
+        <div id="question-grid-desktop" class="grid grid-cols-8 xl:grid-cols-9 gap-1.5 max-h-72 overflow-y-auto pr-1">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </aside>
 
   </main>
 
@@ -158,11 +178,11 @@
     const STORAGE_KEY = 'gdct_itc_296_single_locked_v2';
 
     let state = {
-      mode: 'practice',        // 'practice' | 'exam'
+      mode: 'practice',
       examSubmitted: false,
-      currentIndex: 0,         // 0..295
-      deck: [],                // [{ id, displayNum, optionOrder: ['B','D','A','C'] }]
-      answers: {},             // questionId -> lockedOriginalKey ('A'|'B'|'C'|'D')
+      currentIndex: 0,
+      deck: [],
+      answers: {},
       drawerOpen: false
     };
 
@@ -254,7 +274,7 @@
         drawer.classList.add('translate-x-0');
         backdrop.classList.remove('hidden');
         arrow.classList.add('rotate-180');
-        const activeBtn = document.getElementById(`gbtn-${state.currentIndex}`);
+        const activeBtn = document.getElementById(`gbtn-mob-${state.currentIndex}`);
         if (activeBtn) activeBtn.scrollIntoView({ block: 'nearest' });
       } else {
         drawer.classList.add('-translate-x-full');
@@ -338,13 +358,11 @@
       document.getElementById('submit-exam-btn').classList.toggle('hidden', !(state.mode === 'exam' && !state.examSubmitted));
     }
 
-    function renderGrid() {
-      const grid = document.getElementById('question-grid');
-      document.getElementById('grid-count').textContent = state.deck.length;
-      grid.innerHTML = state.deck.map((item, idx) => {
+    function buildGridButtons(prefix) {
+      return state.deck.map((item, idx) => {
         const st = getQStatus(item.id);
         const isCurrent = idx === state.currentIndex;
-        let cls = 'h-9 rounded-lg text-xs font-bold flex items-center justify-center border transition cursor-pointer ';
+        let cls = 'h-8 rounded-lg text-xs font-bold flex items-center justify-center border transition cursor-pointer ';
         if (isCurrent) cls += 'ring-2 ring-teal-500 ring-offset-1 dark:ring-offset-slate-900 ';
 
         if (st === 'undone') {
@@ -356,8 +374,18 @@
         } else {
           cls += 'bg-rose-500 text-white border-rose-600';
         }
-        return `<button id="gbtn-${idx}" onclick="jumpToIndex(${idx})" class="${cls}">${item.displayNum}</button>`;
+        return `<button id="gbtn-${prefix}-${idx}" onclick="jumpToIndex(${idx})" class="${cls}">${item.displayNum}</button>`;
       }).join('');
+    }
+
+    function renderGrid() {
+      const gridDesktop = document.getElementById('question-grid-desktop');
+      const gridMobile = document.getElementById('question-grid-mobile');
+      if (gridDesktop) gridDesktop.innerHTML = buildGridButtons('desk');
+      if (gridMobile) gridMobile.innerHTML = buildGridButtons('mob');
+
+      const activeDesk = document.getElementById(`gbtn-desk-${state.currentIndex}`);
+      if (activeDesk) activeDesk.scrollIntoView({ block: 'nearest' });
     }
 
     function jumpToIndex(idx) {
@@ -471,9 +499,9 @@
               ← Câu trước
             </button>
 
-            <button onclick="toggleLeftPanel()" class="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer">
-              Câu ${state.currentIndex + 1} / ${state.deck.length} (Mở DS)
-            </button>
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 text-center">
+              Câu <b class="text-slate-700 dark:text-slate-300">${state.currentIndex + 1}</b> / ${state.deck.length}
+            </div>
 
             <button onclick="stepQuestion(1)" ${state.currentIndex >= state.deck.length - 1 ? 'disabled' : ''} class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold disabled:opacity-40 disabled:pointer-events-none shadow-xs transition cursor-pointer">
               Câu tiếp theo →
