@@ -72,13 +72,7 @@
             📘 Giáo Dục Chính Trị (296 câu)
           </button>
           <button id="tab-pl_all" onclick="switchSubject('pl_all')" class="px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer">
-            ⚖️ Pháp Luật: Tất Cả (382 câu)
-          </button>
-          <button id="tab-pl_1" onclick="switchSubject('pl_1')" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer">
-            📄 Đề cương PL 1 (185 câu)
-          </button>
-          <button id="tab-pl_2" onclick="switchSubject('pl_2')" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition cursor-pointer">
-            📄 Đề cương PL 2 (197 câu)
+            ⚖️ Pháp Luật (382 câu)
           </button>
         </div>
       </div>
@@ -202,22 +196,10 @@
         getQuestions: () => GDCT_BANK
       },
       pl_all: {
-        title: 'Pháp Luật Đại Cương (Đề 1 & Đề 2)',
+        title: 'Pháp Luật (382 Câu)',
         badge: '382 Câu • Pháp Luật',
         storageKey: 'pl_itc_all_382_single_locked_v1',
         getQuestions: () => PL_BANK
-      },
-      pl_1: {
-        title: 'Đề Cương Pháp Luật 1',
-        badge: '185 Câu • Pháp Luật 1',
-        storageKey: 'pl_itc_1_185_single_locked_v1',
-        getQuestions: () => PL_BANK.filter(q => q.lesson === 1)
-      },
-      pl_2: {
-        title: 'Đề Cương Pháp Luật 2',
-        badge: '197 Câu • Pháp Luật 2',
-        storageKey: 'pl_itc_2_197_single_locked_v1',
-        getQuestions: () => PL_BANK.filter(q => q.lesson === 2)
       }
     };
 
@@ -277,7 +259,7 @@
       document.getElementById('subject-badge').textContent = cfg.badge;
 
       // Update subject tabs styling
-      ['gdct', 'pl_all', 'pl_1', 'pl_2'].forEach(k => {
+      ['gdct', 'pl_all'].forEach(k => {
         const btn = document.getElementById(`tab-${k}`);
         if (k === subjKey) {
           btn.className = 'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-teal-600 text-white shadow-xs transition cursor-pointer';
